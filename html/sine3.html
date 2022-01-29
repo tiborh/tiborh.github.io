@@ -1,0 +1,159 @@
+<!doctype html>
+<html class="" lang="en">
+    <head>
+        <meta http-equiv="Content-type" content="text/html" charset="utf-8"/>
+        <title>Sine</title>
+	<style>
+	  * {
+	      box-sizing: border-box;
+	  }
+	  
+	  /* Create two equal columns that floats next to each other */
+	  .column {
+	      float: left;
+	      padding: 10px;
+	  }
+
+	  /* Clear floats after the columns */
+	  .row:after {
+	      content: "";
+	      display: table;
+	      clear: both;
+	  }
+	</style>
+	<script type="text/javascript">
+	  const dotSize = 2;
+	  const pi = Math.PI;
+	  let canvas;
+	  let dataarea;
+	  let cwidth;
+	  let cheight;
+	  let yzero;
+	  let xzero;
+	  let context;
+	  function drawDot(cntxt,x,y,colour) {
+	      cntxt.strokeStyle = colour;
+	      cntxt.beginPath();
+              cntxt.arc(x,y,dotSize,0, 2*pi,true);
+              cntxt.stroke();
+	  }
+	  function drawAxes(cntxt,x,y) {
+	      cntxt.beginPath();
+	      cntxt.moveTo(0,y);
+	      cntxt.lineTo(2*x,y);
+	      cntxt.moveTo(x,0);
+	      cntxt.lineTo(x,2 * y);
+	      cntxt.stroke();
+	  }
+	  function insertDataRow(datatable,xval,yval,pos=0) {
+	      const datarow = datatable.insertRow(pos);
+	      const xcell = datarow.insertCell(0);
+	      const ycell = datarow.insertCell(1);
+	      xcell.innerHTML = xval.toFixed(2);
+	      ycell.innerHTML = yval.toFixed(2);
+	      xcell.style.border = "1px solid black";
+	      ycell.style.border = "1px solid black";
+	      xcell.style.textAlign = "right";
+	      ycell.style.textAlign = "right";
+	  }
+	  function drawFunc(context,datatable,func,xzero=0,yzero=0,xmultip=1,ymultip=1,colour="black") {
+	      let i = -2 * pi;
+	      for (let rowcounter = 0; i <= 2 * pi; i+=0.05, ++rowcounter) {
+		  const xcoord = xzero + xmultip * i;
+		  const ycoord = yzero - ymultip * func(i);
+		  insertDataRow(datatable,xcoord,ycoord,rowcounter);
+		  drawDot(context,xcoord,ycoord,colour);
+	      }
+	  }
+	  function createTable(elem,tableid,headrow=["x","y"]) {
+	      const dv = document.createElement('div');
+	      dv.setAttribute('class','column');
+	      const timestamp = Date.now();
+	      tableid = tableid + timestamp;
+	      dv.setAttribute('id','div' + timestamp);
+	      elem.appendChild(dv);
+	      const tbl = document.createElement('table');
+	      tbl.style.border = '2px solid black';
+	      tbl.setAttribute('id', tableid + Date.now());
+	      const thead = document.createElement('thead');
+	      thead.setAttribute('id', tableid + 'Th');
+	      const theadrow = document.createElement('tr');
+	      const th1 = document.createElement('th');
+	      th1.appendChild(document.createTextNode(headrow[0]));
+	      const th2 = document.createElement('th');
+	      th2.appendChild(document.createTextNode(headrow[1]));
+	      theadrow.appendChild(th1);
+	      theadrow.appendChild(th2);
+	      thead.appendChild(theadrow);
+	      const tbdy = document.createElement('tbody');
+	      tbdy.setAttribute('id', tableid + 'Tb');
+	      // etc.
+	      tbl.appendChild(thead);
+	      tbl.appendChild(tbdy);
+	      dv.appendChild(tbl);
+	      return(tbdy);
+	  }
+	  function drawFunc(context,dataarea,tablename,func,xzero=0,yzero=0,xmultip=1,ymultip=1,colour="black") {
+	      let i = -2 * pi;
+	      var datapoints = createTable(dataarea,tablename,["x",tablename + "(x)"]);
+	      for (let rowcounter = 0; i <= 2 * pi; i+=0.05, rowcounter++) {
+		  const xcoord = xzero + xmultip * i;
+		  const ycoord = yzero - ymultip * func(i);
+		  insertDataRow(datapoints,xcoord,ycoord,rowcounter);
+		  drawDot(context,xcoord,ycoord,colour);
+	      }
+	  }
+	  function drawSinFunc(tableId,xmultipid,ymultipid) {
+	      const xmultip = document.getElementById(xmultipid).value;
+	      console.log("xmultip == " + xmultip);
+	      const ymultip = document.getElementById(ymultipid).value;
+	      console.log("ymultip == " + ymultip);
+	      drawFunc(context,dataarea,'sin',Math.sin,xzero,yzero,xmultip,ymultip);
+	  }
+	  function clearData(canvasid,areaid) {
+	      canvas = document.getElementById(canvasid);
+	      context = canvas.getContext("2d");
+	      context.clearRect(0, 0, canvas.width, canvas.height);
+	      dataarea = document.getElementById(areaid);
+	      const children = dataarea.children;
+	      for (let i = children.length; i > 0; --i) {
+		  const areaChild = children[i-1];
+		  dataarea.removeChild(areaChild);		  
+	      }
+	      drawAxes(context,xzero,yzero);
+	  }
+	  function pageLoaded(testcanvasname,dataareaname) {
+	      console.log("Page has loaded.");
+	      canvas = document.getElementById(testcanvasname);
+	      dataarea = document.getElementById(dataareaname);
+	      context = canvas.getContext("2d");
+	      cwidth = canvas.width;
+	      cheight = canvas.height;
+	      yzero = cheight / 2;
+	      xzero = cwidth / 2;
+	      drawAxes(context,xzero,yzero);
+	  }
+	</script>
+    </head>
+    <body onload="pageLoaded('testcanvas','dataPointsArea')">
+      <h1>Graph</h1>
+      <div class="row">
+	<div class="column">
+	  <canvas width="640" height="480" id="testcanvas" style="border: 1px solid black;">
+	    Your browser does not support HTML5 canvas.
+	    Please try a newer browser.
+	  </canvas>
+	</div>
+	<div id='buttons' class="column">
+	  <p>x multiplier: <input id='sinxmultip' value='50' type="number" />
+	     y multiplier: <input id='sinymultip' value='200' type="number" />
+	     <input id="sinBtn" type="button" value="sin()" onclick="drawSinFunc('sinTable','sinxmultip','sinymultip');" /></p>
+	  <p><input id="clearCanvasBtn" type="button" value="Clear Data" onclick="clearData('testcanvas','dataPointsArea');" /></p>
+
+	</div>
+      </div>
+      <h1>Data Points</h1>
+      <div id="dataPointsArea">
+      </div>
+    </body>
+</html>
