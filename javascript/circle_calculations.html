@@ -1,0 +1,144 @@
+<!doctype html>
+<html class="" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Circle Calculations with Event Listeners</title>
+	<style>
+	  td {
+	      /* border: 1px solid #000000; */
+	      text-align: right;
+	  }
+	  .right {
+	      text-align: right;
+	  }
+	  h1 {
+	      font-size: 3vw;
+	  }
+	  table, input, button {
+	      font-size: 2vw;
+	  }
+	</style>
+	<script>
+	  var dec_places = 2;
+	  class Circle {
+#radius = 0;
+#area = 0;
+#circumference = 0;
+	      constructor(radius) {
+		  this.#radius = radius;
+	      }
+	      calc_area() { this.#area = this.#radius * this.#radius * Math.PI; }
+	      calc_circ() { this.#circumference = 2 * this.#radius * Math.PI; }
+	      calc_rad_from_area() { this.#radius = Math.sqrt(this.#area / Math.PI); }
+	      calc_rad_from_circ() { this.#radius = this.#circumference / 2 / Math.PI; }
+	      get radius() { return this.#radius; }
+	      get area() { return this.#area; }
+	      get circumference() { return this.#circumference; }
+	      set radius(r) {
+		  this.#radius = r;
+		  this.calc_area();
+		  this.calc_circ();
+	      }
+	      set area(a) {
+		  this.#area = a;
+		  this.calc_rad_from_area();
+		  this.calc_circ();
+	      }
+	      set circumference(c) {
+		  this.#circumference = c;
+		  this.calc_rad_from_circ();
+		  this.calc_area();
+	      }
+	  }
+	  function dump_circle(c) {
+	      console.log(c);
+	      console.log("Radius: ", c.radius);
+	      console.log("Area: ", c.area);
+	      console.log("Circ: ", c.circumference);
+	  }
+	  function calc_from_radius(circ,radius_box,area_box,circumference_box) {
+	      circ.radius = radius_box.value;
+	      circumference_box.value = Number(circ.circumference).toFixed(dec_places);
+	      area_box.value = Number(circ.area).toFixed(dec_places);
+	      dump_circle(circ);
+	  }
+	  function calc_from_area(circ,radius_box,area_box,circumference_box) {
+	      circ.area = area_box.value;
+	      radius_box.value = Number(circ.radius).toFixed(dec_places);
+	      circumference_box.value = Number(circ.circumference).toFixed(dec_places);
+	      dump_circle(circ);
+	  }
+	  function calc_from_circumference(circ,radius_box,area_box,circumference_box) {
+	      circ.circumference = circumference_box.value;
+	      radius_box.value = Number(circ.radius).toFixed(dec_places);
+	      area_box.value = Number(circ.area).toFixed(dec_places);
+	      dump_circle(circ);
+	  }
+	</script>
+    </head>
+    <!-- <body> -->
+    <body onload="calc_from_radius(c,cirrad,cirarea,circirc)">
+      <h1>Circle</h1>
+      <table>
+	<tr>
+	  <td>Radius:</td>
+	  <td><input class="right" type="text" id="circ_radius" autofocus></input></td>
+	  <td><button onclick="calc_from_radius(c,cirrad,cirarea,circirc)" id="circ_rad_btn">Calculate</button></td>
+	</tr>
+	<tr>
+	  <td>Area:</td>
+	  <td><input class="right" type="text" id="circ_area"></input></td>
+	  <td><button onclick="calc_from_area(c,cirrad,cirarea,circirc)" id="circ_area_btn">Calculate</button></td>
+	</tr>
+	<tr>
+	  <td>Circumference:</td>
+	  <td><input class="right" type="text" id="circ_circ"></input></td>
+	  <td><button onclick="calc_from_circumference(c,cirrad,cirarea,circirc)" id="circ_circ_btn">Calculate</button></td>
+	</tr>
+      </table>
+      <!-- <p><button onclick="clear_rectangle()">Clear</button></p> -->
+
+      <script>
+	var cirrad = document.getElementById("circ_radius");
+	var cirrad_btn = document.getElementById("circ_rad_btn");
+	var cirarea = document.getElementById("circ_area");
+	var cirarea_btn = document.getElementById("circ_area_btn");
+	var circirc = document.getElementById("circ_circ");
+	var circirc_btn = document.getElementById("circ_circ_btn");
+	const c = new Circle(1);
+	cirrad.addEventListener("keydown", function (event) { 
+            if (event.keyCode == 13) {
+		event.preventDefault();
+                //calc_from_radius(c,'circ_radius','circ_circ','circ_area');
+		cirrad_btn.click();
+            }
+        });
+	cirrad.addEventListener("change", function (event) { 
+		event.preventDefault();
+		cirrad_btn.click();
+        });
+	cirarea.addEventListener("keydown", function (event) { 
+            if (event.keyCode == 13) {
+		event.preventDefault();
+                //calc_from_area(c,'circ_radius','circ_circ','circ_area');
+		cirarea_btn.click();
+            }
+        });
+	cirarea.addEventListener("change", function (event) { 
+		event.preventDefault();
+		cirarea_btn.click();
+        });
+	circirc.addEventListener("keydown", function (event) { 
+            if (event.keyCode == 13) {
+		event.preventDefault();
+                //calc_from_circumference(c,'circ_radius','circ_circ','circ_area');
+		circirc_btn.click();
+            }
+        });
+	circirc.addEventListener("change", function (event) { 
+		event.preventDefault();
+		circirc_btn.click();
+        });
+      </script>
+    </body>
+</html>

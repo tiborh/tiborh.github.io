@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Text to Colour</title>
+    <link rel="shortcut icon" type="image/jpg" href="img/favicon.ico"/>
+    <style type="text/css">
+      .centre {
+	  margin-left: auto;
+	  margin-right: auto;
+	  text-align: center;
+      }
+      div {
+	  text-align: center;
+      }
+      h1 {
+	  text-align: center;
+	  font-size: 200%;
+      }
+      body {
+	  font-size: 2vw;
+      }
+      button {
+	  font-size: 2vw;
+      }
+      td {
+	  padding: 1vw;
+      }
+      input {
+	  width: 6vw;
+	  height: 2vw;
+	  vertical-align: top;
+	  font-size: 2vw;
+      }
+    </style>
+    <script type="text/javascript">
+      function proc_str(str) {
+	  const out_codes = Array();
+	  const len = str.length;
+	  let a_code = "#";
+	  for (let i = 0; i <  len; ++i) {
+	      let a_char = str.charCodeAt(i).toString(16).padStart(2,'0');
+	      if(a_code.length + a_char.length > 7) {
+		  a_code = a_code.padEnd(7,'0');
+		  out_codes.push(a_code);
+		  a_code = "#";
+	      }
+	      a_code = a_code.concat(a_char);
+	  }
+	  if (a_code.length > 1) {
+	      a_code = a_code.padEnd(7,'0');
+	      out_codes.push(a_code);
+	  }
+	  return(out_codes);
+      }
+      function prepare_output(colour_array,target_space,btn_rm,break_after=40) {
+	  const t = document.createElement("table");
+	  const t_id = document.createAttribute("id");
+	  t_id.value = "colour_tbl";
+	  t.setAttributeNode(t_id);
+	  const t_class = document.createAttribute("class");
+	  t_class.value = "centre";
+	  t.setAttributeNode(t_class);
+	  const len = colour_array.length;
+	  const max = len + (break_after - (len % break_after));
+	  console.log(`Max: ${max}`);
+	  let trow = document.createElement("tr");
+	  for(let i = 0; i < max; ++i) {
+	      const tcell = document.createElement("td");
+	      if (i < len) {
+		  tcell.style.backgroundColor = colour_array[i];
+	      } else {
+		  tcell.style.backgroundColor = "#ffffff";
+	      }
+	      trow.appendChild(tcell);
+	      if ((i+1) % break_after ==0) {
+		  t.appendChild(trow);
+		  trow = document.createElement("tr");
+	      }
+	  }
+	  target_space.appendChild(t);
+	  document.getElementById(btn_rm).disabled = false;
+      }
+      function convert_text(btn_rm_id,num_of_cols_id) {
+	  const col_arr = proc_str(inp_box.value);
+	  console.log(`Length: ${col_arr.length}`);
+	  console.log(col_arr);
+	  prepare_output(col_arr,out_spc,btn_rm_id,document.getElementById(num_of_cols_id).value);
+      }
+      function remove_table(btn_rm) {
+	  const rm_btn = document.getElementById(btn_rm);
+	  console.log(out_spc.childNodes);
+	  console.log(out_spc.childNodes[0]);
+	  out_spc.removeChild(out_spc.childNodes[0]);
+	  if (out_spc.childNodes.length == 0) {
+	      rm_btn.disabled = true;
+	  }
+      }
+      function watch_text_length(btn_conv_id) {
+	  const btn_conv = document.getElementById(btn_conv_id);
+	  if (inp_box.value.length > 0) {
+	      btn_conv.disabled = false;
+	  } else {
+	      btn_conv.disabled = true;
+	  }
+      }
+    </script>
+    </head>
+  <body>
+    <h1>Text to Colour Converter</h1>
+    <p class="centre">The colour tables need to be deleted with the <b>Remove a Table</b> button.<br />Each new one is added at the bottom, and the button deletes the one on the top.</p>
+    <div id="input_area">
+      <textarea rows="30" cols="200" id="input_box" placeholder="Enter text" oninput="watch_text_length('btn_convert')"></textarea><br /> <!-- onchange requires clicking outside the box -->
+      <button id="btn_convert" onclick="convert_text('btn_remove','num_of_cols')" disabled>Convert</button>
+      <button id="btn_remove" onclick="remove_table('btn_remove')" disabled>Remove a Table</button>
+      <input type="number" size="3" id="num_of_cols" value="10"> Number of columns</input>
+    </div>
+    <p><br /><br /></p>
+    <div id="output_area"></div>
+    <script type="text/javascript">
+      const inp_box = document.getElementById("input_box");
+      const out_spc = document.getElementById("output_area");
+    </script>
+  </body>
+</html>

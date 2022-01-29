@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Graph algorithm test</title>
+    <style>
+        #out_id {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff0000;
+            transition: 0.5s;
+        }
+    </style>
+    <script type="text/javascript" src="graph.js"></script>
+    <script type="text/javascript">
+      const elem = {
+	  delim: ",",
+	  delim2: " ",
+	  quote: '"',
+	  endl: "\n",
+      };
+      let g;
+      function read_image2(input,src_id,btn_id,output,nverts,nedges,delim=elem.delim2,endl=elem.endl) {
+	  output.innerHTML = "reading input started";
+	  nverts.innerHTML = "reading";
+	  nedges.innerHTML = "reading";
+	  //console.log(input)
+	  if (input.files && input.files[0]) {
+	      const reader = new FileReader();
+	      document.getElementById(src_id).disabled = true;
+	      document.getElementById(btn_id).disabled = true;
+	      reader.readAsBinaryString(input.files[0]);
+	      reader.onload = function (e) {
+		  //console.log(e);
+		  parse_sedgewick_data(e.target.result.split(endl),src_id,btn_id,nverts,nedges,output,delim);
+	      }
+	  }
+      }
+      function parse_sedgewick_data(dat_lines,src_id,btn_id,nverts,nedges,output,delim) {
+	  console.log("parse: started");
+	  output.innerHTML = "parsing started";
+	  const emsg = "not a number";
+	  const nuvert = Number(dat_lines[0]);
+	  const nuedge = Number(dat_lines[1]);
+	  nverts.innerHTML = nuvert;
+	  nedges.innerHTML = nuedge;
+	  //console.log("Number of vertices: " + nuvert);
+	  //console.log("Number of edges: " + nuedge);
+	  if (nuvert != nuvert || nuedge != nuedge) {
+	      console.assert(nuvert == nuvert,{vertices: nuvert, emsg: emsg});
+	      console.assert(nuedge == nuedge,{edges: nuedge, emsg: emsg});
+	      output.innerHTML = "invalid input file";
+	      return false;
+	  }
+	  g = new Graph(nuvert);
+	  const len = dat_lines.length;
+	  for(let i = 2; i < len; ++i) {
+	      const arr = dat_lines[i].trim().split(delim);
+	      if (arr.length == 2)
+		  g.add_edge(Number(arr[0].trim()),Number(arr[1].trim()));
+	  }
+	  output.innerHTML = "parsing completed";
+	  console.log("parse: done");
+	  document.getElementById(src_id).disabled = false;
+	  document.getElementById(btn_id).disabled = false;
+	  return true;
+      }
+      function test_connectedness(sid,resout,riterrecur,rdfsbfs) {
+	  resout.innerHTML = "Testing connectedness";
+	  const source = Number(document.getElementById(sid).value);
+	  const iter_recur = document.getElementsByName(riterrecur)[0].checked ? 'iter' : 'recur';
+	  const dfs_bfs = document.getElementsByName(rdfsbfs)[0].checked ? 'dfs' : 'bfs';
+	  let search;
+	  try {
+	      if (iter_recur == 'iter')
+		  search = (dfs_bfs == 'dfs') ? new DepthFirstSearchIterative(g,source): new BreadthFirstSearchIterative(g,source);
+	      else
+		  search = (dfs_bfs == 'dfs') ? new DepthFirstSearchRecursive(g,source): new BreadthFirstSearchRecursive(g,source);
+	      const verts = [];
+	      for(let v = 0; v < g.nu_vertices(); ++v)
+		  if(search.marked(v))
+		      verts.push(v);
+	      const out_str = (search.count() != g.nu_vertices() ? "Not c" : "C") + "onnected";
+	      console.log(out_str);
+	      resout.innerHTML = out_str;
+	  } catch(e) {
+	      console.log(e);
+	      resout.innerHTML = "failed (see console for details)";
+	  }
+      }
+    </script>
+    </head>
+  <body>
+    <h1>Test Connectedness</h1>
+    <p><b>Note:</b> known to work properly in Chromium browser only.</p>
+    <p>Sedgewick Input: <input title="select file with graph input" type="file" id="file_sedge_in" onChange="read_image2(this,'source_id','btn_test',result_out,nvert_out,nedge_out)"></p>
+    <table>
+      <tr><td>Number of vertices:</td><td id="td_id_nu_vert"></td></tr>
+      <tr><td>Number of edges:</td><td id="td_id_nu_edge"></td></tr>
+    </table>
+    <p>Test connectedness: <input type="number" id="source_id" value="0" disabled><input type="button" value="Test" id="btn_test" onClick="result_out.innerHTML='testing';test_connectedness('source_id',result_out,'iter_recur','dfs_bfs')" disabled></p>
+    <table>
+      <tr>
+	<td><input type="radio" name="iter_recur" value="iter" checked>Iterative</input></td>
+	<td><input type="radio" name="dfs_bfs" value="iter" checked>Depth-First Search</input></td>
+      </tr>
+      <tr>
+	<td><input type="radio" name="iter_recur" value="recur">Recursive</input></td>
+	<td><input type="radio" name="dfs_bfs" value="recur">Breadth-First Search</input></td>
+      </tr>
+    </table>
+    <p>Result: <span id="out_id">?</span></p>
+    <p><b>Note:</b> <tt>Recusive</tt> algorithms have some limitations. They work with the <tt>tiny</tt> and <tt>medium</tt> examples from <a href="#References">References</a>, but the stack is not large enough for the <tt>large</tt> sample. (check the <strong>Console</strong> if there is no result)</p>
+    <h1>Data Description</h1>
+    <ol>
+      <li>Number of Vertices (integer)</li>
+      <li>Number of Edges (integer)</li>
+      <li>from&lt;space>to(integers)</li>
+      <li>...</li>
+    </ol>
+    <h2>Example</h2>
+    <pre>
+10
+9
+0 1
+0 2
+0 3
+0 4
+0 5
+0 6
+0 7
+0 8
+0 9
+    </pre>
+    <h1>References</h1>
+    <ul>
+      <li>A few examples are downloadable from <a href="./graph_data/">this directory</a>
+      <li><a href="https://algs4.cs.princeton.edu/41graph/Graph.java.html">Graph.java</a> where you can find source links and further explanation.</li>
+      <li><a href="../dyngraph/index.html">Dyngraph</a> can be used to generate and save random graphs (see <a href="../dyngraph/index.html#sedge">Sedgewick I/O</a>)</li>
+      <li><a href="https://www.chromium.org/getting-involved/download-chromium">How to download Chromium browser</a></li>
+    </ul>
+    <script type="text/javascript">
+      const blink = document.getElementById('out_id');
+	  setInterval(function() {
+	    blink.style.opacity = (blink.style.opacity == 0 ? 1 : 0);
+	  }, 1500);
+      const nvert_out = document.getElementById('td_id_nu_vert');
+      const nedge_out = document.getElementById('td_id_nu_edge');
+      const result_out = document.getElementById('out_id');
+    </script>
+  </body>
+</html>

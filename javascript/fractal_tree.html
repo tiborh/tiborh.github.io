@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fractal Tree</title>
+    <link rel="shortcut icon" type="image/jpg" href="img/favicon.ico"/>
+    <!-- https://progur.com/2016/10/procedural-generation-create-fractal-trees-javascript.html -->
+    <style type="text/css">
+      body {
+	  font-family: helvetica,arial,sans-serif;
+      }
+      h1 {
+	  text-align: center;
+      }
+      body {
+	  background: #27221F; /* 墨色 「すみいろ」*/
+	  /* color: #EBF6F7;      /\* 藍白 「あいじろ」*\/ */
+	  color: #FFDDCA;      /* 白練 「しろねり」*/
+      }
+      hr {
+	  border: 1px solid #FFDDCA;      /* 白練 「しろねり」*/
+      }
+      canvas {
+	  background: #171412; /* 黒色 「こくしょく」*/
+	  /* background: #181B26; /\* 褐色 「かちいろ」*\/ */
+	  padding: 0;
+	  margin: 0 auto;
+	  margin-bottom: 1rem;
+	  display: block;
+      }
+      .column {
+	  float: left;
+	  padding: 1vw;
+      }
+      .centred {
+	  margin-left: auto;
+	  margin-right: auto;
+	  text-align: center;
+      }
+      #contrl_space {
+	  width: 22.5%;
+      }
+      #canvas_space {
+	  width: 70%;
+      }
+    </style>
+    <script type="text/javascript">
+
+    </script>
+    </head>
+  <body>
+    <!-- https://medium.com/dev-compendium/setup-a-canvas-starter-boilerplate-4f9188238f34 -->
+    <div class="column" id="contrl_space">
+      <h1>Controls</h1>
+      <table>
+	<tbody>
+	<tr>
+	  <th colspan="3">Colours</th>
+	</tr>
+	<tr>
+	  <td>tree colour</td>
+	  <td class="centred"><input id="inp_strokecol" type="color" value="#7F5D3B" onchange="setval('strokecol')"></td>
+	  <td><span id="sp_strokecol">#7F5D3B</span></td>
+	</tr>
+	<tr>
+	  <td>back colour</td>
+	  <td class="centred"><input id="inp_backcol" type="color" value="#171412"  onchange="setval('backcol')"></td>
+	  <td><span id="sp_backcol">#171412</span></td>
+	</tr>
+	<tr><td colspan="3"><hr></td></tr>
+	<tr>
+	  <th colspan="3">Tree Form</th>
+	</tr>
+	<tr>
+	  <td>Bezier Lines</td>
+	  <td><input type="checkbox" id="cb_bezier" onchange="submenu_conf(this,'tbl_bezpars');redraw();"></td>
+	  <td></td>
+	</tr>
+	<tr>
+	  <td colspan="3"><div>
+	      <table id="tbl_bezpars">
+		<tr>
+		  <td>divider</td>
+		  <td class="centred"><input id="inp_bezdiv" type="range" min="1" max="5" step="1" value="2" onchange="setval('bezdiv')"></td>
+		  <td><span id="sp_bezdiv">2</span></td>
+		</tr>
+		<tr>
+		  <td>bezcurve</td>
+		  <td class="centred"><input id="inp_bezcurve" type="range" min="1" max="15" step="1" value="5" onchange="setval('bezcurve')"></td>
+		  <td><span id="sp_bezcurve">5</span></td>
+		</tr>
+	      </table>
+	    </div></td>
+	</tr>
+	<tr>
+	  <td>Branches:</td>
+	  <td colspan="2">
+	    <label>LR<input type="checkbox" id="cb_leftbranch" onchange="redraw();" checked> </label>
+	    <label>M<input type="checkbox" id="cb_midbranch" onchange="redraw();"> </label>
+	    <label>RL<input type="checkbox" id="cb_rightbranch" onchange="redraw();" checked></label>
+	  </td>
+	</tr>
+	<tr>
+	  <td>Leaves</td>
+	  <td><input type="checkbox" id="cb_leaves" onchange="submenu_conf(this,'tbl_leafcol');redraw();"></td>
+	  <td></td>
+	</tr>
+	<tr>
+	  <td colspan="3"><div>
+	      <table id="tbl_leafcol">
+		<tr>
+		  <td>leaf colour</td>
+		  <td class="centred"><input id="inp_fillcol" type="color" value="#006442" onchange="setval('fillcol')"></td>
+		  <td><span id="sp_fillcol">#006442</span></td>
+		</tr>
+	      </table>
+	    </div></td>
+	</tr>
+	<tr>
+	  <td>Rand Angle</td>
+	  <td><input type="checkbox" id="cb_randangle" onchange="ang_reconf('tbl_fixang','tbl_randang');redraw()"></td>
+	  <td></td>
+	</tr>
+	<tr>
+	  <td colspan="3"><div>
+	      <table id="tbl_fixang">
+		<tr>
+		  <td>Angle Change</td>
+		  <td><input type="range" min="1" max="180" step="1" value="15" id="inp_dangle" onchange="setval('dangle')"></td>
+		  <td><span id="sp_dangle">15</span></td>
+		</tr>
+	      </table>
+	      <table id="tbl_randang">
+		<tr>
+		  <td>Min Angle Change</td>
+		  <td><input type="range" min="-45" max="180" step="1" value="15" id="inp_mindangle" onchange="setval('mindangle')"></td>
+		  <td><span id="sp_mindangle">15</span></td>
+		</tr>
+		<tr>
+		  <td>Max Angle Change</td>
+		  <td><input type="range" min="1" max="180" step="1" value="15" id="inp_maxdangle" onchange="setval('maxdangle')"></td>
+		  <td><span id="sp_maxdangle">15</span></td>
+		</tr>
+		<tr>
+		  <td colspan="3" class="centred"><input type="button" onclick="redraw()" value="Redraw"></td>
+		</tr>
+	      </table>
+	  </div></td>
+	</tr>
+	<tr>
+	  <td>Shadow</td>
+	  <td><input type="checkbox" id="cb_shadow" onchange="init();"></td>
+	  <td></td>
+	</tr>
+	<tr>
+	  <td>Length Multip</td>
+	  <td><input type="range" min="0.1" max="0.85" step="0.01" value="0.8" id="inp_lenmultip" onchange="setval('lenmultip')"></td>
+	  <td><span id="sp_lenmultip">0.8</span></td>
+	</tr>
+	<tr>
+	  <td>Thickness Multip</td>
+	  <td><input type="range" min="0.1" max="0.95" step="0.01" value="0.8" id="inp_thickmultip" onchange="setval('thickmultip')"></td>
+	  <td><span id="sp_thickmultip">0.8</span></td>
+	</tr>
+	<tr>
+	  <td>Start Length</td>
+	  <td><input type="range" min="5" max="200" step="5" value="120" id="inp_startlen" onchange="setval('startlen')"></td>
+	  <td><span id="sp_startlen">120</span></td>
+	</tr>
+	<tr>
+	  <td>Line Width</td>
+	  <td><input type="range" min="0.5" max="16" step="0.1" value="3.1" id="inp_lnwidth" onchange="setval('lnwidth')"></td>
+	  <td><span id="sp_lnwidth">3.1</span></td>
+	</tr>
+	<tr><td colspan="3"><hr></td></tr>
+	<tr>
+	  <th colspan="3">Tree Placement</th>
+	</tr>
+	<tr>
+	  <td>start x</td>
+	  <td><input type="range" min="0" max="1000" step="1" value="500" class="slider" id="inp_startx" onchange="setval('startx')"></td>
+	  <td><span id="sp_startx">500</span></td>
+	</tr>
+	<tr>
+	  <td>start y</td>
+	  <td><input type="range" min="0" max="800" step="1" value="750" class="slider" id="inp_starty" onchange="setval('starty')"></td>
+	  <td><span id="sp_starty">750</span></td>
+	</tr>
+	<tr>
+	  <td>Tree Angle</td>
+	  <td><input type="range" min="-180" max="180" step="5" value="0" id="inp_treeangle" onchange="setval('treeangle')"></td>
+	  <td><span id="sp_treeangle">0</span></td>
+	</tr>
+	<tr><td colspan="3"><hr></td></tr>
+	<tr>
+	  <th colspan="3">Animation</th>
+	</tr>
+	<tr>
+	  <td colspan="3">
+	    <table class="centred">
+	      <tr>
+		<td>Start length: </td>
+		<td><input type="radio" name="anim_type" value="slen" checked></td>
+	      </tr>
+	      <tr>
+		<td>Angle change: </td>
+		<td><input type="radio" name="anim_type" value="dangle"></td>
+	      </tr>
+	    </table>
+	  </td>
+	</tr>
+	<tr>
+	  <td>from</td>
+	  <td><input type="range" min="0" max="150" value="5" id="inp_fropar" onchange="setval('fropar')"/></td>
+	  <td><span id="sp_fropar">5</span></td>
+	</tr>
+	<tr>
+	  <td>to</td>
+	  <td><input type="range" min="0" max="150" value="150" id="inp_topar" onchange="setval('topar')"/></td>
+	  <td><span id="sp_topar">150</span></td>
+	</tr>
+	<tr>
+	  <td>increment</td>
+	  <td><input type="range" min="1" max="10" value="1" id="inp_anincr" onchange="setval('anincr')"/></td>
+	  <td><span id="sp_anincr">1</span></td>
+	</tr>
+	<tr>
+	  <td>pause</td>
+	  <td><input type="range" min="0" max="100" value="10" id="inp_anipaus" onchange="setval('anipaus')"/></td>
+	  <td><span id="sp_anipaus">10</span></td>
+	</tr>
+	<tr>
+	  <td colspan="3" class="centred"><input type="button" onclick="grow_tree()" value="Animate"></td>
+	</tr>
+	</tbody>
+      </table>
+    </div>
+    <div class="column" id="canvas_space">
+      <h1>Fractal Tree</h1>
+      <canvas id="a_canvas" width="1000" height="800"></canvas>
+    </div>
+    <script type="text/javascript">
+      //     ;(function () {
+      // initialize config variables here
+      let canv, ctx;
+      const params = {
+	  canvas: document.getElementById("a_canvas"),
+	  cutoff: 10,
+	  drawback: true,
+	  strokecol: "#7F5D3B",
+	  fillcol: "#006442",
+	  backcol: "#171412",
+	  lnwidth: 3.1,
+	  anipaus: 10,
+	  anincr: 1,
+	  istrunk: true,
+	  hasleftbr: document.getElementById("cb_leftbranch"),
+	  hasrightbr: document.getElementById("cb_rightbranch"),
+	  hasmidbr:  document.getElementById("cb_midbranch"),
+	  bezier: document.getElementById("cb_bezier"),
+	  bezpars: document.getElementById("tbl_bezpars"),
+	  bezdiv: 2,
+	  bezcurve: 5,
+	  leaves: document.getElementById("cb_leaves"),
+	  shadow: document.getElementById("cb_shadow"),
+	  startx: 500,
+	  starty: 750,
+	  startlen: 120,
+	  lenmultip: 0.8,
+	  thickmultip: 0.8,
+	  treeangle: 0,
+	  dangle: 15,
+	  mindangle: 15,
+	  maxdangle: 15,
+	  randangle: document.getElementById("cb_randangle"),
+	  fropar: 5,
+	  topar: 150,
+	  deg2rad: Math.PI/180,
+	  anim: false,
+	  animtype: document.getElementsByName("anim_type"),
+      };
+      function ang_reconf(fix_id,rnd_id){
+	  const fix = document.getElementById(fix_id);
+	  const rnd = document.getElementById(rnd_id)      ;
+	  if(params.randangle.checked) {
+	      //console.log("rand angle");
+	      fix.style.display = "none";
+	      rnd.style.display = "block";
+	  } else {
+	      //console.log("fix angle");
+	      fix.style.display = "block";
+	      rnd.style.display = "none";
+	  }
+      }
+      function submenu_conf(cb,tbl_id) {
+	  const tbl = document.getElementById(tbl_id);
+	  tbl.style.display = cb.checked ? "block" : "none";
+      }
+      function setval(param,pars=params) {
+	  const val = document.getElementById("inp_"+param).value;
+	  document.getElementById("sp_"+param).innerHTML = val;
+	  params[param] = val;
+	  init();
+      }
+      function clear_canvas(from_x=0,
+			    from_y=0,
+			    to_x=params.canvas.width,
+			    to_y=params.canvas.height,
+			    pars=params,
+			    drawback=params.drawback,
+			    c2d=ctx) {
+	  c2d.clearRect(from_x, from_y, to_x, to_y);
+	  params.istrunk=true;
+	  if(drawback) {
+	      const saved_fillStyle = c2d.fillStyle;
+	      c2d.fillStyle= params.backcol;
+	      c2d.fillRect(from_x, from_y, to_x, to_y);
+	      c2d.fillStyle = saved_fillStyle;
+	  }
+      }
+      function draw(startX, startY, len, angle, branchwdth, left=true, middle=false, right=true) {
+	  ctx.beginPath();
+	  ctx.save();
+	  ctx.translate(startX, startY);
+	  const multip = angle < 1 ? -1 : 1;
+	  const minangle = Number(params.mindangle);
+	  const maxangle = Number(params.maxdangle)-minangle;
+	  const bangle = params.randangle.checked ? (Math.random()*maxangle+minangle)*multip : angle;
+	  ctx.rotate((params.istrunk ? angle : bangle) * params.deg2rad);
+	  ctx.lineWidth = branchwdth;
+	  ctx.moveTo(0, 0);
+	  if(params.bezier.checked) {
+	      const div = Number(params.bezdiv);
+	      const curv = Number(params.bezcurve);
+	      if(angle > 0) {
+		  ctx.bezierCurveTo(curv, -len/div, curv, -len/div, 0, -len);
+	      } else {
+		  ctx.bezierCurveTo(-curv, -len/div, -curv, -len/div, 0, -len);
+	      }
+	  } else
+	      ctx.lineTo(0, -len);
+	  ctx.stroke();
+	  params.istrunk = false;
+	  
+	  if(len < Number(params.cutoff)) {
+	      if(params.leaves.checked) {
+		  ctx.beginPath();
+		  ctx.arc(0, -len, 10, 0, Math.PI/2);
+		  ctx.fill();
+	      }
+	      ctx.restore();
+	      return;
+	  }
+	  //console.log(dangle);
+	  if (left)
+	      draw(0, -len, len*Number(params.lenmultip), Number(params.dangle),branchwdth*Number(params.thickmultip),right,middle,left);
+	  if (middle)
+	      draw(0, -len, len*Number(params.lenmultip), 0,branchwdth*Number(params.thickmultip),right,middle,left);
+	  if (right)
+	      draw(0, -len, len*Number(params.lenmultip), -Number(params.dangle),branchwdth*Number(params.thickmultip),right,middle,left);
+	  
+	  ctx.restore();
+      }
+      function grow_tree() {
+	  let id = null;
+	  let tree_par = Number(params.fropar);
+	  let frame = params.animtype[0].checked ? lenframe : angframe;
+	  clearInterval(id);
+	  id = setInterval(frame, Number(params.anipaus));
+	  function lenframe() {
+	      if (tree_par > params.topar)
+		  clearInterval(id);
+	      else {
+		  clear_canvas();
+		  draw(Number(params.startx),Number(params.starty),Number(tree_par),Number(params.treeangle),Number(params.lnwidth));
+		  tree_par+=Number(params.anincr);
+	      }
+	  }
+	  function angframe() {
+	      if (tree_par > params.topar)
+		  clearInterval(id);
+	      else {
+		  params.dangle = tree_par;
+		  redraw();
+		  tree_par+=Number(params.anincr);
+	      }
+	  }
+      }
+      function redraw() {
+	  clear_canvas();
+	  draw(Number(params.startx),
+	       Number(params.starty),
+	       Number(params.startlen),
+	       Number(params.treeangle),
+	       Number(params.lnwidth),
+	       params.hasleftbr.checked,
+	       params.hasmidbr.checked,
+	       params.hasrightbr.checked);
+      }
+      // setup config variables and start the program
+      function init () {
+	  ang_reconf("tbl_fixang","tbl_randang");
+	  //canv = document.getElementById("a_canvas");
+	  ctx = params.canvas.getContext("2d");
+	  ctx.lineWidth = params.lnwidth;
+	  ctx.strokeStyle = params.strokecol;
+	  ctx.fillStyle = params.fillcol;
+	  if(params.shadow.checked) {
+	      ctx.shadowBlur = 15;
+	      ctx.shadowColor = "rgba(23,20,18,0.8)";
+	  } else {
+	      ctx.shadowBlur = 0;
+	      ctx.shadowColor = "rgba(0,0,0,0)";
+	  }
+	  
+	  submenu_conf(params.leaves,"tbl_leafcol");
+	  submenu_conf(params.bezier,"tbl_bezpars");
+	  redraw();
+	  //create_grid();
+      }
+      // wait for the HTML to load
+      document.addEventListener("DOMContentLoaded", init);
+//      })()
+    </script>
+    </body>
+</html>

@@ -1,0 +1,290 @@
+<!doctype html>
+<html class="" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Draw Random Shapes</title>
+	<link rel="shortcut icon" type="image/png" href="img/shapes.ico"/>
+	<style type="text/css">
+	  body {
+	      background: #27221F; /* 墨色 「すみいろ」*/
+	      /* color: #EBF6F7;      /\* 藍白 「あいじろ」*\/ */
+	      color: #FFDDCA;      /* 白練 「しろねり」*/
+	      font-family: helvetica,arial,sans-serif;
+	  }
+	  table {
+	      width: 95vw;
+	      height: 95vh;
+	  }
+	  input, label {
+	      font-size: 1.8vw;
+	      vertical-align: middle;
+	  }
+	  input.cb {
+	      width: 2vw;
+	      height: 2vh;
+	  }
+	  input.rb {
+	      width: 2.5vw;
+	      height: 2.5vh;
+	  }
+	  .drawspace {
+	      height: 95%;
+	  }
+	  td {
+	      /* border: 1px solid #00ff00; */
+	      vertical-align: middle;
+	  }
+	  .fix_width {
+	      width: 198px;
+	  }
+	  .centred {
+	      margin-left: auto;
+	      margin-right: auto;
+	      text-align: center;
+	  }
+	  .left_aligned {
+	      text-align: left;
+	  }
+	  .right_aligned {
+	      text-align: right;
+	  }
+	  canvas {
+	      background: #171412; /* 黒色 「こくしょく」*/
+	      /* background: #181B26; /\* 褐色 「かちいろ」*\/ */
+	      padding: 0;
+	      margin: 0 auto;
+	      margin-bottom: 1rem;
+	      display: block;
+	  }
+	</style>
+	<script type="text/javascript">
+	  let canvas_width = window.innerWidth * 0.95;
+	  let canvas_height = window.innerHeight * 0.9;
+	  const min_num = 0;
+	  let max_div = 40;
+	  let min_div = 4;
+	  let curr_x = 0;
+	  let curr_y = 0;
+	  let _stop = true;
+
+	  class Point {
+	      constructor(x,y) {
+		  this.x = x;
+		  this.y = y;
+	      }
+	  }
+
+	  class Dims {
+	      constructor(w,h) {
+		  this.w = w;
+		  this.h = h;
+	      }
+	  }
+  
+	  function sleep(ms) {
+	      return new Promise(resolve => setTimeout(resolve, ms));
+	  }
+
+	  function resize_canvas(new_width=canvas_width,
+				 new_height=canvas_height) {
+	      canv.width=new_width;
+	      canv.height=new_height;
+	  }
+
+	  function gen_num(nmax,nmin=min_num) {
+	      if (nmax < nmin) {
+		  const tmp = nmax;
+		  nmax = nmin;
+		  nmin = tmp;
+	      }
+	      return(Math.floor((Math.random() * (nmax-nmin+1)) + nmin));
+	  }
+
+	  function gen_colour() {
+	      red = gen_num(255);
+	      green = gen_num(255);
+	      blue = gen_num(255);
+	      the_colour = "#"+Number(red).toString(16).padStart(2,'0')+Number(green).toString(16).padStart(2,'0')+Number(blue).toString(16).padStart(2,'0');
+	      console.log("colour: " + the_colour);
+	      return the_colour;
+	  }
+	  
+	  // ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle [, anticlockwise]);
+	  function draw_ellipse(p,d,a,rot) {
+	      console.log({w: d.w/2, h: d.h/2, rot: rot});
+	      ctx.ellipse(p.x,p.y,d.w/2,d.h/2,rot,a.s,a.e);
+	  }
+
+	  function draw_rect(p,d,rot,is_round) {
+	      const tx = p.x + d.w/2;
+	      const ty = p.y + d.h/2;
+	      ctx.save();
+	      if (rot != 0) {
+		  ctx.translate(tx,ty);
+		  ctx.rotate(rot);
+		  ctx.translate(-tx,-ty);
+	      }
+	      if(is_round) {
+		  const r = d.w > d.h ? d.h/4 : d.w/4;
+		  console.log({w: d.w, h: d.h, r: r, rot: rot});
+		  roundedRect(ctx,p.x,p.y,d.w,d.h,r);
+	      } else {
+		  console.log({w: d.w, h: d.h, rot: rot});
+		  if (cb_fill.checked) {
+		      ctx.fillRect(p.x,p.y,d.w,d.h);
+		  } else {
+		      ctx.rect(p.x,p.y,d.w,d.h);
+		  }
+	      }
+	      ctx.restore();
+	  }
+	  
+	  function roundedRect(ctx, x, y, width, height, radius) {
+	      ctx.beginPath();
+	      ctx.moveTo(x, y + radius);
+	      ctx.lineTo(x, y + height - radius);
+	      ctx.arcTo(x, y + height, x + radius, y + height, radius);
+	      ctx.lineTo(x + width - radius, y + height);
+	      ctx.arcTo(x + width, y + height, x + width, y + height-radius, radius);
+	      ctx.lineTo(x + width, y + radius);
+	      ctx.arcTo(x + width, y, x + width - radius, y, radius);
+	      ctx.lineTo(x + radius, y);
+	      ctx.arcTo(x, y, x, y + radius, radius);
+	      ctx.closePath();
+	      //ctx.stroke();
+	  }
+	  
+	  function draw_shape() {
+	      const p = new Point(gen_num(canv.width-1),gen_num(canv.height-1));
+	      let d = new Dims(0,0);
+	      if (!cb_onedim.checked) {
+		  d.w = gen_num(canv.width/min_div,canv.width/max_div);
+		  d.h = gen_num(canv.height/min_div,canv.height/max_div);
+	      } else {
+		  d.w = (canv.width > canv.height) ? gen_num(canv.height/min_div,canv.height/max_div) : gen_num(canv.width/min_div,canv.width/max_div);
+		  d.h = d.w;
+	      }
+	      const rot = cb_rotate.checked ? gen_num(90) : 0;
+	      
+	      const a = { s: 0, e: 2*Math.PI };
+
+	      console.log({x: p.x, y: p.y});
+	      if (cb_fill.checked) {
+		  ctx.fillStyle = gen_colour();
+	      }
+	      if (cb_outline.checked || !cb_fill.checked) {
+		  ctx.strokeStyle = gen_colour();
+		  if (!cb_outline.checked && !cb_fill.checked) {
+		      cb_outline.checked = true;
+		  }
+	      }
+	      ctx.globalAlpha = Math.random();
+	      ctx.beginPath();
+	      if (rb_ellip.checked) {
+		  draw_ellipse(p,d,a,rot);
+	      } else if (rb_rect.checked) {
+		  //cb_rotate.checked = false;
+		  draw_rect(p,d,rot,false);
+	      } else if (rb_rrect.checked) {
+		  //cb_rotate.checked = false;
+		  draw_rect(p,d,rot,true);
+	      }
+	      if (cb_outline.checked) {
+		  ctx.stroke();
+	      }
+	      if (cb_fill.checked) {
+		  ctx.fill();
+	      }
+	  }
+	  
+	  async function draw() {
+	      _stop = false;
+	      btn_draw.disabled = true;
+	      btn_interrupt.disabled = false;
+
+	      while(!_stop) {
+		  draw_shape();
+		  await sleep(Number(n_delay.value));
+	      }
+	      btn_draw.disabled = false;
+	      btn_interrupt.disabled = true;
+	  }
+	  
+	  function clear_rectangle(from_x=0,
+				   from_y=0,
+				   to_x=canvas_width,
+				   to_y=canvas_height) {
+	      ctx.clearRect(from_x, from_y, to_x, to_y);
+	  }
+	</script>
+    </head>
+    <body onload="resize_canvas()">
+      <table class="centred">
+	<tr class="drawspace">
+	  <td colspan="8"><canvas id="a_canvas" height="0" width="0" style="border:1px solid #000000;" onclick="new function() {if (_stop) {draw();} else {_stop=true;} } " ondblclick="clear_rectangle()"></canvas></td>
+	</tr>
+	<tr>
+	  <td class="left_aligned fix_width"><input type="button" id="btn_interrupt" onclick="_stop=true" value="Pause" disabled /></td>
+	  <td class="left_aligned fix_width"><input type="button" id="btn_draw" onclick="draw()" value="Draw" /></td>
+	  <td class="left_aligned fix_width"><label><input type="checkbox" class="cb" id="cb_onedim" />Same w&amp;h</label></td>
+	  <td class="left_aligned fix_width"><label><input type="checkbox" class="cb" id="cb_outline" />Outline</label></td>
+	  <td class="centred fix_width"><label><input type="radio" name="shape" class="rb" id="rb_ellip" checked />Ellipse</label></td>
+	  <td class="centred fix_width"><label><input type="radio" name="shape" class="rb" id="rb_rect" />Rectangle</label></td>
+	  <td class="centred fix_width"><label><input type="radio" name="shape" class="rb" id="rb_rrect" />RRect</label></td>
+	  <td class="right_aligned fix_width"><input type="button" onclick="clear_rectangle()" value="Clear" /></td>
+	</tr>
+	<tr>
+	  <td></td>
+	  <td></td>
+	  	  <td class="left_aligned fix_width"><label><input type="checkbox" class="cb" id="cb_rotate" />Rotate</label></td>
+	  <td class="left_aligned fix_width"><label><input type="checkbox" class="cb" id="cb_fill" checked />Fill</label></td>
+	  <td></td>
+	  <td></td>
+	  <td></td>
+	  <td></td>
+	</tr>
+	<tr>
+	  <td colspan="2" class="left_aligned"><label>Delay: <input type="number" min="1" max="1000" value="250" id="num_delay" /></label></td>
+	  <td></td>
+	  <td colspan="2" class="right_aligned"><label>Width: <input type="number" min="64" max="4096" value="" id="num_pict_width" oninput="canv.width = Number(this.value); canvas_width = canv.width;" /></label></td>
+	  <td class="right_aligned"><label>min_div:</label></td>
+	  <td colspan="2" class="left_aligned"><input type="number" min="1" max="10" value="4" id="num_mindiv" oninput="min_div = Number(this.value);" /></td>
+	</tr>
+	<tr>
+	  <td></td>
+	  <td></td>
+	  <td></td>
+	  <td colspan="2" class="right_aligned"><label>Height: <input type="number" min="64" max="4096" value="" id="num_pict_height" oninput="canv.height = Number(this.value); canvas_height = canv.height;" /></label></td>
+	  <td class="right_aligned"><label>max_div:</label></td>
+	  <td colspan="2" class="left_aligned"><input type="number" min="11" max="99" value="40" id="num_maxdiv" oninput="max_div = Number(this.value);" /></td>
+	</tr>
+      </table>
+      <script type="text/javascript">
+	const canv = document.getElementById("a_canvas");
+	if (!canv.getContext) {
+	    throw "Cannot get canvas context.";
+	}
+	const ctx = canv.getContext('2d');
+	const btn_draw = document.getElementById("btn_draw");
+	const btn_interrupt = document.getElementById("btn_interrupt");
+	const cb_onedim = document.getElementById("cb_onedim");
+	const cb_outline = document.getElementById("cb_outline");
+	const cb_fill = document.getElementById("cb_fill");
+	const cb_rotate = document.getElementById("cb_rotate");
+	const rb_ellip = document.getElementById("rb_ellip");
+	const rb_rect = document.getElementById("rb_rect");
+	const rb_rrect = document.getElementById("rb_rrect");
+	const n_delay = document.getElementById("num_delay");
+	const n_pictw = document.getElementById("num_pict_width");
+	const n_picth = document.getElementById("num_pict_height");
+	n_pictw.value = canvas_width;
+	n_picth.value = canvas_height;
+	// n_pictw.addEventListener("change",function() { canv.width = Number(this.value); canvas_width = canv.width; });
+	// n_picth.addEventListener("change",function() { canv.height = Number(this.value); canvas_height = canv.height; });
+	// const n_mindiv = document.getElementById("num_mindiv");
+	// n_mindiv.addEventListener("change",function() { min_div = Number(this.value); });
+	// const n_maxdiv = document.getElementById("num_maxdiv");
+	// n_maxdiv.addEventListener("change",function() { max_div = Number(this.value); });
+      </script>
+     </body>
+</html>

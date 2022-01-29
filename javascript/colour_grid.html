@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Colour Grid</title>
+    <link rel="shortcut icon" type="image/jpg" href="img/favicon.ico"/>
+    <style type="text/css">
+      body,input {
+	  font-family: helvetica,arial,sans-serif;
+	  font-size: 2vw;
+      }
+      input.rb {
+	  width: 2.5vw;
+	  height: 2.5vh;
+      }
+      h2 {
+	  text-align: center;
+      }
+      #canvas_space {}
+      body {
+	  background: #27221F; /* 墨色 「すみいろ」*/
+	  /* color: #EBF6F7;      /\* 藍白 「あいじろ」*\/ */
+	  color: #FFDDCA;      /* 白練 「しろねり」*/
+      }
+      td,th {
+	  padding: 1vw;
+      }
+      canvas {
+	  background: #171412; /* 黒色 「こくしょく」*/
+	  /* background: #181B26; /\* 褐色 「かちいろ」*\/ */
+	  padding: 0;
+	  margin: 0 auto;
+	  margin-bottom: 1rem;
+	  display: block;
+      }
+      /* Create two equal columns that floats next to each other */
+      .column {
+	  float: left;
+	  padding: 1vw;
+      }
+      /* Clear floats after the columns */
+      .row:after {
+	  content: "";
+	  display: table;
+	  clear: both;
+      }
+      .left_aligned {
+	  text-align: left;
+      }
+      .centred {
+	  text-align: center;
+      }
+    </style>
+    <script type="text/javascript">
+
+    </script>
+    </head>
+  <body>
+    <!-- https://medium.com/dev-compendium/setup-a-canvas-starter-boilerplate-4f9188238f34 -->
+    <h2>Colour Grid</h2>
+    <div class="column" id="canvas_space">
+      <canvas id="a_canvas" width="800" height="800" />
+    </div>
+    <div class="column">
+      <table>
+	<tr>
+	  <td rowspan="2" style="vertical-align: top"><b>Colour</b></td>
+	  <th colspan="2">By</th>
+	  <th></th>
+	</tr>
+	<tr>
+	  <th>Column</th>
+	  <th>Row</th>
+	  <!-- <th>cell<br /> +1</th> -->
+	  <th></th>
+	</tr>
+	<tr>
+	  <td><b>Red</b></td>
+	  <th><input type="radio" name="rb_red" class="rb" value="col" checked /></th>
+	  <th><input type="radio" name="rb_red" class="rb" value="row" /></th>
+	  <!-- <th><input type="radio" name="rb_red" class="rb" value="cel" /></th> -->
+	  <th><input type="button" class="btn" value="Unselect" id="btn_res_red" /></th>
+	</tr>
+	<tr>
+	  <td><b>Green</b></td>
+	  <th><input type="radio" name="rb_green" class="rb" value="col" /></th>
+	  <th><input type="radio" name="rb_green" class="rb" value="row" checked /></th>
+	  <!-- <th><input type="radio" name="rb_green" class="rb" value="cel" /></th> -->
+	  <th><input type="button" class="btn" value="Unselect" id="btn_res_green" /></th>
+	</tr>
+	<tr>
+	  <td><b>Blue</b></td>
+	  <th><input type="radio" name="rb_blue" class="rb"  value="col" /></th>
+	  <th><input type="radio" name="rb_blue" class="rb"  value="row" /></th>
+	  <!-- <th><input type="radio" name="rb_blue" class="rb"  value="cel" checked /></th> -->
+	  <th><input type="button" class="btn" value="Unselect" id="btn_res_blue" /></th>
+	</tr>
+	<!-- <tr> -->
+	<!--   <td colspan="4" class="centred"><input type="button" class="btn" value="Redraw" id="btn_gen_grid" /></td> -->
+	<!-- </tr> -->
+      </table>
+    </div>
+    
+    <script type="text/javascript">
+      ;(function () {
+	  // initialize config variables here
+	  let canvas, ctx;
+	  // const btn_gen = document.getElementById("btn_gen_grid");
+	  // btn_gen.addEventListener("click",update_rd_selections);
+	  const rd_red = document.getElementsByName("rb_red");
+	  const rd_green = document.getElementsByName("rb_green");
+	  const rd_blue = document.getElementsByName("rb_blue");
+	  const rd_btns = { red: rd_red, green: rd_green, blue: rd_blue };
+	  const rd_selections = { red: '', green: '', blue: ''};
+	  const btn_rred = document.getElementById("btn_res_red");
+	  btn_rred.addEventListener("click",function() { reset_radio("rb_red"); });
+	  const btn_rgreen = document.getElementById("btn_res_green");
+	  btn_rgreen.addEventListener("click",function() { reset_radio("rb_green"); });
+	  const btn_rblue = document.getElementById("btn_res_blue");
+	  btn_rblue.addEventListener("click",function() { reset_radio("rb_blue"); });
+
+	  function add_event_listeners() {
+	      for (colour in rd_btns) {
+		  for (rd of rd_btns[colour]) {
+		      rd.addEventListener("change",update_rd_selections);
+		  }
+	      }
+	  }
+	  
+	  function update_rd_selections() {
+	      for (colour in rd_btns) {
+		  let has_changed = false;
+		  //console.log({colour: colour});
+		  for (rd of rd_btns[colour]) {
+		      //console.log({rd: rd});
+		      if (rd.checked) {
+			  //console.log(colour + ": " + rd.value);
+			  rd_selections[colour] = rd.value;
+			  has_changed = true;
+		      }
+		  }
+		  if (!has_changed) {
+		      rd_selections[colour] = "";
+		  }
+	      }
+	      draw_grid(rd_selections);	      
+	  }
+
+	  function draw_grid(colm) {
+	      const len = 50;
+	      const multiplier = len / 16;
+
+	      let red = 0;
+	      let green = 0;
+	      let blue = 0;
+
+	      tab_map = {
+		  row: 0,
+		  col: 0
+//		  cel: 0
+	      };
+
+	      // console.log(colm)
+	      
+	      ctx.save();		      // save styles
+	      
+	      for(; tab_map['row'] < 255; tab_map['row']+=16) {
+		  for(tab_map['col'] = 0; tab_map['col'] < 255; tab_map['col']+=16) {
+		      red = tab_map[colm['red']] || 0;
+		      green = tab_map[colm['green']] || 0;
+		      blue = tab_map[colm['blue']] || 0;
+		      //console.log({red: red, green: green, blue: blue});
+		      ctx.fillStyle = 'rgb(' + red + ',' + green + ',' + blue + ')';
+		      ctx.beginPath();
+		      ctx.fillRect(tab_map['row']*multiplier,tab_map['col']*multiplier,len,len);      
+		      ctx.fill();
+		      // tab_map['cel']++;
+		  }
+	      }
+	      // restore the styles from before this function was called
+	      ctx.restore();
+	  }
+
+	  // setup config variables and start the program
+	  function init () {
+	      canvas = document.getElementById('a_canvas');
+	      //canvas.addEventListener("click",update_rd_selections);
+	      add_event_listeners();
+	      ctx = canvas.getContext('2d');
+	      update_rd_selections();
+	  }
+
+	  function reset_radio(radio_name) {
+	      const rd = document.getElementsByName(radio_name);
+	      for( it of rd) {
+		  if(it.checked) {
+		      // console.log(it.value);
+		      it.checked = false;
+		  }
+	      }
+	      update_rd_selections();
+	  }
+	  
+	  // wait for the HTML to load
+	  document.addEventListener('DOMContentLoaded', init);
+      })()
+    </script>
+    </body>
+</html>

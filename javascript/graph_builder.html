@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Graph Builder</title>
+    <script type="text/javascript" src="graph.js"></script>
+    <style type="text/css">
+      input[type=checkbox] {
+	  /* width: 2vw; */
+	  /* height: 2vh; */
+	  margin: 0pt;
+      }
+      .column {
+	  float: left;
+	  padding: 1vw;
+      }
+    </style>
+    </head>
+  <body>
+    <table>
+      <tr>
+	<td rowspan="2">Size: <input type="number" min="2" max="100" id='size_input' onChange="build_matrix(this.value)"/></td>
+	<td><input type="checkbox" id="id_self_ref" /> allow self reference</td>
+      </tr>
+      <tr>
+	<td><input type="checkbox" id="id_digraph" /> digraph</td>
+      </tr>
+      <tr>
+	<td colspan="2"><input type="file" id="file_sedge_in" onChange="read_image(this,'size_input','id_self_ref')"></td>
+      </tr>
+      <tr>
+	<td colspan="2"><input type="button" id="btn_save_as_sedge" value="Save as" onclick="save_as_sedge('inp_sedge_fn',delim2,endl,'id_digraph');" disabled> <input type="text" id="inp_sedge_fn" value="sedge_out.txt"></td>
+      </tr>
+    </table>
+    <div class="column" id="matrix_id"></div>
+    <div class="column" id="adj_space"><pre id="edge_list_id" rows="10" cols="41"></pre></div>
+    <script type="text/javascript">
+      const delim = "_";
+      const delim2 = " ";
+      const endl = "\n";
+      const row_prefix = "row";
+      const col_prefix = "col";
+      const hi_colour = "#FCC9B9"; // 桜色
+      const lo_colour = "#ffffff";
+      let g;
+      function generate_table_head(table,data) {
+	  let thead = table.createTHead();
+	  let row = thead.insertRow();
+	  for (let i in data) {
+	      let th = document.createElement("th");
+	      const th_id = document.createAttribute("id");
+	      th_id.value = `${col_prefix}${delim}${i-1}`;
+	      th.setAttributeNode(th_id);
+	      let text = document.createTextNode(data[i]);
+	      th.appendChild(text);
+	      row.appendChild(th);
+	  }
+      }
+      function generate_table_foot(table,data) {
+	  let tfoot = table.createTFoot();
+	  let row = tfoot.insertRow();
+	  for (let key of data) {
+	      let th = document.createElement("th");
+	      let text = document.createTextNode(key);
+	      th.appendChild(text);
+	      row.appendChild(th);
+	  }
+      }
+      function highlighter(id,is_hi) {
+	  const coords = id.split(delim);
+	  const row_id = `${row_prefix}${delim}${coords[0]}`;
+	  const row_head = document.getElementById(row_id);
+	  const col_id = `${col_prefix}${delim}${coords[1]}`;
+	  const col_head = document.getElementById(col_id);
+	  if (is_hi) {
+	      row_head.style.backgroundColor = hi_colour;
+	      col_head.style.backgroundColor = hi_colour;
+	  } else {
+	      row_head.style.backgroundColor = lo_colour;
+	      col_head.style.backgroundColor = lo_colour;
+	  }
+	  //console.log(`row_${coords[0]}, col_${coords[1]}: ${is_hi ? 'over' : 'out'}`);
+      }
+      function generate_checkbox(i,j,selfref_id,is_digraph) {
+	  const cb = document.createElement("input");
+	  const cb_id = document.createAttribute("id");
+	  cb_id.value = i + delim + j;
+	  cb.setAttributeNode(cb_id);
+	  cb.type = "checkbox";
+	  if (!(document.getElementById(selfref_id).checked))
+	      if(i == j) cb.disabled=true;
+	  if (is_digraph)
+	      if(j < i)
+		  cb.disabled=true;
+	  cb.addEventListener("change", e => {
+	      route_selector(e.target.id,e.target.checked,is_digraph);
+	  });
+	  cb.addEventListener("mouseover", e => {
+	      highlighter(e.target.id,true);
+	  });
+	  cb.addEventListener("mouseout", e => {
+	      highlighter(e.target.id,false);
+	  });
+	  cb.addEventListener("touchenter", e => {
+	      highlighter(e.target.id,true);
+	  });
+	  cb.addEventListener("touchleave", e => {
+	      highlighter(e.target.id,false);
+	  });
+	  return cb;
+      }
+      function mirror_check(i,j) {
+	  const cell_id = `${i}${delim}${j}`
+	  const cell = document.getElementById(cell_id);
+	  const mirror_cell_id = `${j}${delim}${i}`;
+	  const mirror_cell = document.getElementById(mirror_cell_id);
+	  mirror_cell.checked = cell.checked ? true : false;
+      }
+      function route_selector(id,checked,is_digraph,out_id='edge_list_id') {
+	  const coords = id.split(delim);
+	  if (checked)
+	      is_digraph ? g.add_edge(coords[0],coords[1]) : g.add_uni_edge(coords[0],coords[1]);
+	  else
+	      is_digraph ? g.rem_edge(coords[0],coords[1]) : g.rem_uni_edge(coords[0],coords[1]);
+	  //console.log(`${coords}: ${checked}`);
+	  if (is_digraph)
+	      mirror_check(coords[0],coords[1]);
+	  document.getElementById(out_id).innerHTML = Graph.to_str(g);
+      }
+      function build_matrix(val,id='matrix_id',selfref_id='id_self_ref',digraph_id='id_digraph',id_edgelist='edge_list_id',save_btn_id='btn_save_as_sedge') {
+	  document.getElementById(id_edgelist).innerHTML = "";
+	  const parent = document.getElementById(id);
+	  const is_digraph = document.getElementById(digraph_id).checked;
+	  while (parent.childNodes.length > 0)
+	      parent.removeChild(parent.childNodes[0]);
+	  const v = Number(val);
+	  g = new Graph(v);
+	  document.getElementById(save_btn_id).disabled = false;
+	  const t = document.createElement("table");
+	  const t_id = document.createAttribute("id");
+	  t_id.value = "matrix";
+	  t.setAttributeNode(t_id);
+	  const dat = [];
+	  for(let i = 0; i < v; ++i)
+	      dat.push(i);
+	  dat.unshift("");
+	  dat.push("");
+	  generate_table_head(t,dat);
+	  const tb = document.createElement("tbody");
+	  //const table = []
+	  for(let i = 0; i < v; ++i) {
+	      const trow = tb.insertRow();
+	      const rowhead = document.createElement("th");
+	      const th_id = document.createAttribute("id");
+	      th_id.value = `${row_prefix}${delim}${i}`;
+	      rowhead.setAttributeNode(th_id);
+	      const rhtxt = document.createTextNode(i);
+	      rowhead.appendChild(rhtxt);
+	      trow.appendChild(rowhead);
+	      for(let j = 0; j < v; ++j) {
+		  const tcell = document.createElement("td");
+		  const cb = generate_checkbox(i,j,selfref_id,is_digraph);
+		  tcell.appendChild(cb);
+		  trow.appendChild(tcell);
+	      }
+	      const rowtail = document.createElement("th");
+	      const rhtxt2 = document.createTextNode(i);
+	      rowtail.appendChild(rhtxt2);
+	      trow.appendChild(rowtail);
+	  }
+	  t.appendChild(tb);
+	  generate_table_foot(t,dat);
+	  parent.appendChild(t);
+      }
+      function parse_sedgewick_data(dat_lines,size_input,gr) {
+	  const nuvert = Number(dat_lines[0]);
+	  const nuedge = Number(dat_lines[1]);
+	  size_input.value = nuvert;
+	  size_input.dispatchEvent(new Event('change'));
+	  const len = dat_lines.length
+	  for(let i = 2; i < len; ++i) {
+	      const arr = dat_lines[i].trim().split(delim2);
+	      if (arr.length == 2) {
+		  const cb_id = `${arr[0]}${delim}${arr[1]}`;
+		  //console.log(cb_id);
+		  const cb = document.getElementById(cb_id);
+		  cb.checked = true;
+		  cb.dispatchEvent(new Event('change'));
+	      }
+	  }
+      }
+      function read_image(input,vert_nu_id,self_ref_id,gr=g) {
+	  //console.log(input)
+	  document.getElementById(self_ref_id).checked = true;
+	  const size_input = document.getElementById(vert_nu_id);
+	  if (input.files && input.files[0]) {
+	      const reader = new FileReader();
+	      reader.readAsBinaryString(input.files[0]);
+	      reader.onload = function (e) {
+		  parse_sedgewick_data(e.target.result.split(endl),size_input,gr);
+	      }
+	  }
+      }
+      function save_as_sedge(inp_id,delim,endl,digraph_id){
+	  // get canvas data
+	  const fn = document.getElementById(inp_id).value;
+	  const is_digraph = document.getElementById(digraph_id).checked;
+	  const nu_edges = is_digraph ? g.nu_edges() / 2 : g.nu_edges();
+	  let dat_out = "";
+	  dat_out += g.nu_vertices() + endl;
+	  dat_out += nu_edges + endl;
+          for (let i = 0; i < g.nu_vertices(); ++i)
+	      for(let ind of g.get_adj(i)) {
+		  if(is_digraph && ind < i)
+		      continue;
+		  dat_out += i + delim + ind + endl;
+	      }
+	  
+ 	  const sedge_data = new Blob([dat_out], { type: 'text' });  
+          const sedge_url = URL.createObjectURL(sedge_data);
+	  const hiddenElement = document.createElement('a');
+          hiddenElement.href = sedge_url;
+          hiddenElement.target = '_blank';
+          hiddenElement.download = fn;
+          hiddenElement.click();
+      }
+    </script>
+    </body>
+  </html>

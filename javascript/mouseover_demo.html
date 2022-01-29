@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style type="text/css">
+    input {
+	width: 2vw;
+	height: 2vh;
+    }
+  </style>
+  <script type="text/javascript">
+    function draw_boxes() {
+	const cb = document.getElementById("cb_target");
+	for (let i = 0; i < 2401; i++) {
+	    const checkbox = document.createElement("input");
+	    cb.appendChild(checkbox);
+	    checkbox.type = "checkbox";
+	    checkbox.style.margin = 0;
+	    
+	    checkbox.addEventListener("mouseover", e => {
+		e.target.checked = !e.target.checked;
+	    });
+	    checkbox.addEventListener("touchstart", e => {
+		event.preventDefault();
+		e.target.checked = !e.target.checked;
+	    });
+	    checkbox.addEventListener("touchenter", e => {
+		event.preventDefault();
+		e.target.checked = !e.target.checked;
+	    });
+	    checkbox.addEventListener("mouseout", e => setTimeout(() => {
+		e.target.checked = !e.target.checked;
+	    }, 1000));
+	    checkbox.addEventListener("touchleave", e => setTimeout(() => {
+		e.target.checked = !e.target.checked;
+	    }, 1000));
+	    checkbox.addEventListener("touchmove", e => {
+		event.preventDefault();
+	    });
+	}
+    }
+  </script>
+</head>
+<body onload="draw_boxes('cb_target')">
+  <!-- <p id="cb_target"></p> -->
+  <span id="cb_target"></span>
+  <footer><p><br /><a href="https://stackoverflow.com/questions/51433092/addeventlistener-to-multiple-checkboxes">source</a></p></footer>
+</body>
+</html>

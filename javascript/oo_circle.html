@@ -1,0 +1,166 @@
+<!doctype html>
+<!-- source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes -->
+<html class="" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Object Oriented Circle</title>
+	<style>
+	  td {
+	      text-align: right;
+	  }
+	</style>
+	<script>
+	  var canvas_width = 300;
+	  var canvas_height = canvas_width;
+	  var canvas_name = "a_canvas";
+	  var default_colour = "#351E1C";
+	  var default_complement_colour = "#EBF6F7";
+	  var dec_places = 2;
+	  class Circle {
+#radius = 0;
+#fillcolour = "#000000";
+#complcolour = "#ffffff";
+#start_angle=0;
+#end_angle=2*Math.PI;
+	      constructor(radius,fillcolour=default_colour,complcolour=default_complement_colour) {
+		  this.#radius = radius;
+		  this.#fillcolour = fillcolour;
+		  this.#complcolour = complcolour;
+	      }
+	      calc_area() { return(this.#radius * this.#radius * Math.PI); }
+	      calc_circ() { return(2 * this.#radius * Math.PI); }
+	      get radius() { return this.#radius; }
+	      get area() { return this.calc_area(); }
+	      get circumference() { return this.calc_circ(); }
+	      get fillcolour() { return this.#fillcolour; }
+	      get complcolour() { return this.#complcolour; }
+	      set radius(r) { this.#radius = r; }
+	      set fillcolour(c) { this.#fillcolour = c; }
+	      set complcolour(c) { this.#complcolour = c; }
+	      draw(canv_id,centre_x=canvas_width/2,centre_y=canvas_height/2) {
+		  var canv = document.getElementById(canv_id);
+		  var ctx = canv.getContext("2d");
+		  clear_rectangle();
+		  ctx.fillStyle=this.#complcolour;
+		  ctx.fillRect(0,0,canv.width,canv.height);
+		  ctx.fillStyle = this.#fillcolour;
+		  ctx.beginPath();
+		  ctx.arc(centre_x, centre_y, this.#radius, this.#start_angle, this.#end_angle);
+		  ctx.fill();
+	      }
+	  }
+	  function calc_all(circ,val_id,circum_id,area_id) {
+	      target_circum = document.getElementById(circum_id);
+	      target_area = document.getElementById(area_id);
+	      radius_area = document.getElementById(val_id);
+	      new_val = radius_area.value;
+	      circ.radius = new_val;
+	      target_circum.innerHTML = circ.circumference.toFixed(dec_places);
+	      target_area.innerHTML = circ.area.toFixed(dec_places);
+	  }
+	  function colour_select(circ,fillcol_id,ccell_id,cpick_id,complcol_id,complcell_id,complpick_id) {
+	      fillcol_area = document.getElementById(fillcol_id);
+	      fillcol_cell = document.getElementById(ccell_id);
+	      new_fill_col = document.getElementById(cpick_id).value;
+
+	      complfill_area = document.getElementById(complcol_id);
+	      complcol_cell = document.getElementById(complcell_id);
+	      new_compl_col = document.getElementById(complpick_id).value;
+	      
+	      fillcol_area.innerHTML = new_fill_col;
+	      fillcol_cell.style.backgroundColor = new_fill_col;
+	      fillcol_cell.style.color = new_compl_col;
+	      circ.fillcolour = new_fill_col;
+
+	      complfill_area.innerHTML = new_compl_col;
+	      complcol_cell.style.backgroundColor = new_compl_col;
+	      complcol_cell.style.color = new_fill_col;
+	      circ.complcolour = new_compl_col;
+	  }
+	  function pick_swapper(pick_id1,pick_id2) {
+	      picker1 = document.getElementById(pick_id1);
+	      picker2 = document.getElementById(pick_id2);
+	      var temp_value = picker1.value;
+	      picker1.value = picker2.value;
+	      picker2.value = temp_value;
+	  }
+	  function dump_circle(c) {
+	      console.log(c);
+	      console.log("Radius: ", c.radius);
+	      console.log("Area: ", c.area);
+	      console.log("Circ: ", c.circumference);
+	      console.log("Fill colour: ", c.fillcolour);
+	  }
+	  function clear_rectangle(from_x=0,
+				   from_y=0,
+				   to_x=canvas_width,
+				   to_y=canvas_height,
+				   canv=canvas_name) {
+	      var c = document.getElementById(canv);
+	      const ctx = c.getContext('2d');
+	      ctx.clearRect(from_x, from_y, to_x, to_y);
+	  }
+	  function resize_canvas(new_width=canvas_width,
+				 new_height=canvas_height,
+				 canv=canvas_name) {
+	      var c = document.getElementById(canv);
+	      c.width=new_width;
+	      c.height=new_height;
+	  }
+	</script>
+    </head>
+    <!-- <body> -->
+    <body onload="resize_canvas();calc_all(c,'circ_radius','circ_circ','circ_area');colour_select(c,'circ_fillcol','circ_fillcolcell','col_pick','compl_col','compl_colcell','compl_col_pick');c.draw('a_canvas');dump_circle(c)">
+      <h1>Circle</h1>
+      <table>
+	<tr>
+	  <td>Radius:</td>
+	  <td colspan="2"><input style="text-align: right" type="text" id="circ_radius"></input></td>
+	  <td><button onclick="calc_all(c,'circ_radius','circ_circ','circ_area');c.draw('a_canvas');dump_circle(c)">Calculate</button></td>
+	</tr>
+	<tr><td>Area:</td><td colspan="2"><span id="circ_area"></span></td><td></td></tr>
+	<tr><td>Circumference:</td><td colspan="2"><span id="circ_circ"></span></td><td></td></tr>
+	<tr><td>Fill colour:</td><td id="circ_fillcolcell"><span id="circ_fillcol"></span></td>
+	  <td>
+	    <input type="color" id="col_pick" value="#000000">
+	  </td>
+	  <td>
+	    <button onclick="colour_select(c,'circ_fillcol','circ_fillcolcell','col_pick','compl_col','compl_colcell','compl_col_pick');c.draw('a_canvas');dump_circle(c)">Change colour</button>
+	  </td>
+	</tr>
+	<tr><td>Complementary<br /> colour:</td><td id="compl_colcell"><span id="compl_col"></span></td>
+	  <td>
+	      <input type="color" id="compl_col_pick" value="#000000">
+	  </td>
+	  <td>
+	    <button onclick="pick_swapper('col_pick','compl_col_pick');colour_select(c,'circ_fillcol','circ_fillcolcell','col_pick','compl_col','compl_colcell','compl_col_pick');c.draw('a_canvas');dump_circle(c)">Swap colours</button>
+	  </td>
+	</tr>
+	<tr>
+	  <td colspan="4"><canvas id="a_canvas" width="0" height="0" style="border:1px solid #000000;"></canvas><br /></td>
+	</tr>
+      </table>
+      <p>The calculator part only: <a href="circle_calculations.html">Basic circle calculations</a></p>
+      <!-- <p><button onclick="clear_rectangle()">Clear</button></p> -->
+
+      <script>
+	const c = new Circle(canvas_height/2);
+	var cirrad = document.getElementById("circ_radius");
+	cirrad.value = c.radius;
+	
+	var circell = document.getElementById("circ_fillcolcell");
+	circell.style.color = default_complement_colour;
+	circell.style.backgroundColor = c.fillcolour;
+	var colpick = document.getElementById("col_pick");
+	colpick.value = default_colour;
+
+	var complcell = document.getElementById("compl_colcell");
+	complcell.style.color = c.fillcolour;
+	complcell.style.backgroundColor = default_complement_colour;
+	var complcolpick = document.getElementById("compl_col_pick");
+	complcolpick.value = default_complement_colour;
+
+	
+      </script>
+    </body>
+</html>

@@ -1,0 +1,162 @@
+<!doctype html>
+<html class="" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Change Rectangle Colour with Slider</title>
+	<style>
+	  td {
+	      text-align: right;
+	  }
+	  span {
+	      display: inline-block;
+	      width: 40px;
+	  }
+	  /* source: https://www.w3schools.com/howto/howto_js_rangeslider.asp */
+	  .centred {
+	      text-align: center;
+	  }
+	  .slider {
+	      -webkit-appearance: none;
+	      width: 100%;
+	      height: 1px;
+	      border-radius: 5px;
+	      background: #171412;
+	      outline: none;
+	      opacity: 0.7;
+	      -webkit-transition: .2s;
+	      transition: opacity .2s;
+	  }
+	  
+	  .slider::-webkit-slider-thumb {
+	      -webkit-appearance: none;
+	      appearance: none;
+	      width: 25px;
+	      height: 25px;
+	      border-radius: 50%; 
+	      background: #2A603B;
+	      cursor: pointer;
+	  }
+	  
+	  .slider::-moz-range-thumb {
+	      width: 18px;
+	      height: 18px;
+	      border-radius: 50%;
+	      background: #2A603B;
+	      cursor: pointer;
+	  }
+	</style>
+	<script>
+	  var canvas_width = 300;
+	  var canvas_height = 200;
+	  var canvas_name = "a_canvas";
+	  var fix_colour =  "#000088";
+	  function resize_canvas(new_width=canvas_width,
+				 new_height=canvas_height,
+				 canv=canvas_name) {
+	      var c = document.getElementById(canv);
+	      c.width=new_width;
+	      c.height=new_height;
+	  }
+	  function draw_rectangle(fill_colour=fix_colour,
+				  upleft_x=0,
+				  upleft_y=0,
+				  rect_w=canvas_width,
+				  rect_h=canvas_height,
+				  canv=canvas_name) {
+	      var c = document.getElementById(canv);
+	      var ctx = c.getContext("2d");
+	      if (fill_colour == "blank") {
+		  ctx.beginPath();
+		  ctx.rect(upleft_x, upleft_y, rect_w, rect_h);
+		  ctx.stroke();
+	      } else {
+		  ctx.fillStyle = fill_colour;
+		  ctx.fillRect(upleft_x, upleft_y, rect_w, rect_h);
+	      }
+	  }
+	  function clear_rectangle(from_x=0,
+				   from_y=0,
+				   to_x=canvas_width,
+				   to_y=canvas_height,
+				   canv=canvas_name) {
+	      var c = document.getElementById(canv);
+	      const ctx = c.getContext('2d');
+	      ctx.clearRect(from_x, from_y, to_x, to_y);
+	  }
+	</script>
+    </head>
+    <body onload="resize_canvas();draw_rectangle(htmlcolour.innerHTML)">
+      <div class="slidecontainer">
+	<table>
+	  <tr>
+	    <td colspan="4"><canvas id="a_canvas" width="0" height="0" style="border:1px solid #000000;"></canvas></td>
+	  </tr>
+	  <tr>
+	    <td class="centred" colspan="4"><span id="htmlcolour"></span></td>
+	  </tr>
+	  <tr>
+	    <td>赤</td>
+	    <td><input type="range" min="0" max="255" value="29" class="slider" id="red_slider"></td>
+	    <td><span id="redspan"></span></td>
+	    <td><span id="redspanx"></span></td>
+	  </tr>
+	  <tr>
+	    <td>緑</td>
+	    <td><input type="range" min="0" max="255" value="105" class="slider" id="green_slider"></td>
+	    <td><span id="greenspan"></span></td>
+	    <td><span id="greenspanx"></span></td>
+	  </tr>
+	  <tr>
+	    <td>青</td>
+	    <td><input type="range" min="0" max="255" value="124" class="slider" id="blue_slider"></td>
+	    <td><span id="bluespan"></span></td>
+	    <td><span id="bluespanx"></span></td>
+	  </tr>
+      </table>
+      </div>
+      <script>
+	var rslider = document.getElementById("red_slider");
+	var gslider = document.getElementById("green_slider");
+	var bslider = document.getElementById("blue_slider");
+	var rout = document.getElementById("redspan");
+	var gout = document.getElementById("greenspan");
+	var bout = document.getElementById("bluespan");
+	var routx = document.getElementById("redspanx");
+	var goutx = document.getElementById("greenspanx");
+	var boutx = document.getElementById("bluespanx");
+	rout.innerHTML = rslider.value;
+	gout.innerHTML = gslider.value;
+	bout.innerHTML = bslider.value;
+	routx.innerHTML = Number(rslider.value).toString(16).padStart(2,'0');
+	goutx.innerHTML = Number(gslider.value).toString(16).padStart(2,'0');
+	boutx.innerHTML = Number(bslider.value).toString(16).padStart(2,'0');
+	htmlcolour.innerHTML="#"+Number(rslider.value).toString(16).padStart(2,'0')+Number(gslider.value).toString(16).padStart(2,'0')+Number(bslider.value).toString(16).padStart(2,'0');
+	
+	// Update the current slider value (each time you drag the slider handle)
+	rslider.oninput = function() {
+	    rout.innerHTML = this.value;
+	    routx.innerHTML = Number(this.value).toString(16).padStart(2,'0');
+	    clear_rectangle();
+	    colourstr="#"+Number(this.value).toString(16).padStart(2,'0')+Number(gslider.value).toString(16).padStart(2,'0')+Number(bslider.value).toString(16).padStart(2,'0');
+	    draw_rectangle(colourstr);
+	    htmlcolour.innerHTML=colourstr;
+	}
+	gslider.oninput = function() {
+	    gout.innerHTML = this.value;
+	    goutx.innerHTML = Number(this.value).toString(16).padStart(2,'0');
+	    clear_rectangle();
+	    colourstr="#"+Number(rslider.value).toString(16).padStart(2,'0')+Number(this.value).toString(16).padStart(2,'0')+Number(bslider.value).toString(16).padStart(2,'0');
+	    draw_rectangle(colourstr);
+	    htmlcolour.innerHTML=colourstr;
+	}
+	bslider.oninput = function() {
+	    bout.innerHTML = this.value;
+	    boutx.innerHTML = Number(this.value).toString(16).padStart(2,'0');
+	    clear_rectangle();
+	    colourstr="#"+Number(rslider.value).toString(16).padStart(2,'0')+Number(gslider.value).toString(16).padStart(2,'0')+Number(this.value).toString(16).padStart(2,'0');
+	    draw_rectangle(colourstr);
+	    htmlcolour.innerHTML=colourstr;
+	}
+      </script>
+    </body>
+</html>

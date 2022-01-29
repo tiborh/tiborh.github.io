@@ -1,0 +1,122 @@
+<!doctype html>
+<html class="" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Draw Shapes</title>
+    <link rel="shortcut icon" type="image/jpg" href="img/favicon.ico"/>
+    <style>
+      /* button { */
+      /* 	  font-size: 2vw; */
+      /* } */
+      div {
+	  font-size: 2vw;
+	  margin: 0;
+      }
+      input.cb {
+	  width: 2vw;
+	  height: 2vh;
+      }
+      label {
+	  border:1px solid #c6c2b6;
+	  padding:10px;
+	  margin:0 0 10px;
+	  /* display:block;  */
+      }
+
+      label:hover {
+	  background:#c6c2b6;
+	  cursor:pointer;
+      }
+    </style>
+    <script>
+      function draw_line(canv_id) {
+	  const c = document.getElementById(canv_id);
+	  const from_x=0;
+	  const from_y=0;
+	  const to_x=c.width;
+	  const to_y=c.height;
+	  const ctx = c.getContext("2d");
+	  ctx.beginPath();
+	  ctx.moveTo(from_x, from_y);
+	  ctx.lineTo(to_x, to_y);
+	  ctx.stroke();
+      }
+      function draw_square(canv_id) {
+	  const c = document.getElementById(canv_id);
+	  const r = Math.min(c.width/2,c.height/2);
+	  const x = r * Math.sqrt(2)/2
+	  const o_x = c.width/2;
+	  const o_y = c.height/2;
+	  const from_x = o_x - x;
+	  const from_y = o_y - x;
+	  const to_x = 2*x;
+	  const to_y = 2*x;
+	  const ctx = c.getContext("2d");
+	  ctx.beginPath();
+	  ctx.rect(from_x, from_y, to_x, to_y);
+	  ctx.stroke();
+      }
+      function draw_circle(canv_id) {
+	  const c = document.getElementById(canv_id);
+	  const centre_x=c.width/2;
+	  const centre_y=c.height/2;
+	  const radius=Math.min(c.width/2,c.height/2);
+	  const start_angle=0,end_angle=2*Math.PI;
+	  const ctx = c.getContext("2d");
+	  ctx.beginPath();
+	  ctx.arc(centre_x, centre_y, radius, start_angle, end_angle);
+	  ctx.stroke();
+      }
+      function clear_rectangle(canv_id) {
+	  const c = document.getElementById(canv_id);
+	  const from_x=0;
+	  const from_y=0;
+	  const to_x=c.width;
+	  const to_y=c.height;
+	  const ctx = c.getContext('2d');
+	  ctx.clearRect(from_x, from_y, to_x, to_y);
+      }
+      function resize_canvas(canv_id) {
+	  const c = document.getElementById(canv_id);
+	  c.width = window.innerWidth - window.innerWidth/20;
+	  c.height = window.innerHeight - window.innerHeight/10;
+	  console.log("Canvas width == " + c.width);
+	  console.log("Canvas height == " + c.height);
+      }
+      function redraw_canvas(div_id) {
+	  const d = document.getElementById(div_id);
+
+      }
+      const ctrls = {
+	  "draw_line_id":draw_line,
+	  "draw_circle_id":draw_circle,
+	  "draw_square_id":draw_square
+      };
+    </script>
+  </head>
+  <body onload="resize_canvas('a_canvas')">
+    <div id="controls">
+      <label><input type="checkbox" class="cb" id="draw_line_id">Draw line</label>
+      <label><input type="checkbox" class="cb" id="draw_circle_id">Draw circle</label>
+      <label><input type="checkbox" class="cb" id="draw_square_id">Draw square</label>
+    </div>
+    <p><canvas id="a_canvas" style="border:1px solid #000000;"></canvas><br /></p>
+    <script type="text/javascript">
+      document.getElementById("controls").addEventListener("change",function() { ctrl_check("a_canvas","controls"); }, false);
+      function ctrl_check(canv_id,ctrl_id) {
+	  const cb = document.getElementById(ctrl_id);
+	  const cb_children = cb.children;
+	  clear_rectangle(canv_id);
+	  for(let i = 0; i < cb_children.length; i++) {
+	      //console.log(cb_children[i].children);
+	      if (cb_children[i].children[0].checked) {
+		  ctrls[cb_children[i].children[0].id](canv_id);
+	      }
+	  }
+      }
+      window.addEventListener('resize', function() { resize_canvas('a_canvas');
+						     ctrl_check('a_canvas','controls'); }, false);
+    </script>
+  </body>
+</html>

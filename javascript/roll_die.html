@@ -1,0 +1,262 @@
+<!doctype html>
+<html class="" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Roll the Die</title>
+    <link rel="shortcut icon" type="image/jpg" href="img/favicon.ico"/>
+    <!-- <link rel="stylesheet" type="text/css" href="css/reset.css" media="screen"/> -->
+    <style>
+      #outer_space{
+	  /* border: 1px solid #00ff00; */
+	  /* text-align: center; */
+	  position: absolute;
+	  /* top: 50%; */
+	  /* left: 50%; */
+	  margin-top: 0vw;
+	  margin-left: 25vw;
+	  width: 50vw;
+	  height: 50vh;
+      }​
+      #score_space {
+	  /* border: 1px solid #000000; */
+	  background-color: #000000;
+	  width: 18vw;
+	  height: 15vh;
+      }
+      #a_canvas {
+	  border: 1px solid #000000;
+      }
+      table {
+	  /* border: 1px solid #000000 ;*/
+	  background-color: #97645A;
+	  color: #FFDDCA;
+	  width: 20vw;
+	  height: 15vh;
+	  font-size: 2vw;
+      }
+      td {
+	  padding: 1vw;
+      }
+      .die {
+	  font-size: 200%;
+      }
+      .centred {
+	  text-align: center;
+      }
+      button {
+	  font-size: 2vw;
+      }
+    </style>
+    <script>
+      const max_num = 6;
+      const min_num = 1;
+      const canv_id = "a_canvas";
+      const roll_id = "roll_btn";
+      const params = {
+	  roll_counter: 0,
+	  dot_colour: "#264348",
+	  dot_size: 1,
+	  dot_unitx: 1,
+	  dot_unity: 1
+      };
+      function calc_params() {
+	  params.dot_size = canv.width/12;
+	  params.dot_unitx = canv.width/4;
+	  params.dot_unity = canv.width/4;
+      }
+      function log_params() {
+	  console.log(params);
+      }
+      function resize_canvas(canv_id) {
+	  const c = document.getElementById(canv_id);
+	  if (window.innerWidth > window.innerHeight) {
+	      c.width = window.innerWidth / 2;
+	      c.height = window.innerWidth / 2;
+	  } else {
+	      c.width = window.innerHeight / 2;
+	      c.height = window.innerHeight / 2;
+	  }
+	  console.log("Canvas width == " + c.width);
+	  console.log("Canvas height == " + c.width);
+	  //console.log("Canvas height == " + c.height);
+      }
+      function gen_num(nmin=min_num,nmax=max_num) {
+	  return(Math.floor((Math.random() * nmax) + nmin));
+      }
+      function draw_circle(centre_x=0,
+			   centre_y=0,
+			   radius=0,
+			   colour=0,
+			   start_angle=0,
+			   end_angle=2*Math.PI,
+			   canv=canv_id,
+			   die_params=params) {
+	  const c = document.getElementById(canv);
+	  if (centre_x == 0) {
+	      centre_x = c.width/2;
+	  }
+	  if (centre_y == 0) {
+	      centre_y = c.height/2;
+	  }
+	  if (radius == 0) {
+	      radius = die_params.dot_size;
+	  }
+	  if (colour == 0) {
+	      colour == die_params.colour;
+	  }
+
+	  const ctx = c.getContext("2d");
+	  ctx.fillStyle = colour;
+	  ctx.beginPath();
+	  ctx.arc(centre_x, centre_y, radius, start_angle, end_angle);
+	  ctx.fill();
+      }
+      function clear_canvas(from_x=0,
+			    from_y=0,
+			    to_x=0,
+			    to_y=0,
+			    canv=canv_id) {
+	  const c = document.getElementById(canv);
+	  if (to_x == 0) {
+	      to_x = c.width;
+	  }
+	  if (to_y == 0) {
+	      to_y = c.height;
+	  }
+	  const ctx = c.getContext('2d');
+	  ctx.clearRect(from_x, from_y, to_x, to_y);
+	  ctx.beginPath();
+	  ctx.rect(from_x, from_y, to_x, to_y);
+	  ctx.stroke();
+      }
+      function draw_one() {
+	  draw_circle();
+      }
+      function draw_two() {
+	  draw_circle(params.dot_unitx,params.dot_unity);
+	  draw_circle(3*params.dot_unitx,3*params.dot_unity);
+      }
+      function draw_other_two() {
+	  draw_circle(params.dot_unitx,3*params.dot_unity);
+	  draw_circle(3*params.dot_unitx,params.dot_unity);
+      }
+      function draw_mid_two() {
+	  draw_circle(params.dot_unitx,2*params.dot_unity);
+	  draw_circle(3*params.dot_unitx,2*params.dot_unity);
+      }
+      function draw_dots(num){
+	  switch(num) {
+	  case 1:
+	      clear_canvas();
+	      draw_one();
+	      uni.innerHTML = "⚀";
+	      break;
+	  case 2:
+	      clear_canvas();
+	      draw_two();
+	      uni.innerHTML = "⚁";
+	      break;
+	  case 3:
+	      clear_canvas();
+	      draw_one();
+	      draw_two();
+	      uni.innerHTML = "⚂";
+	      break;
+	  case 4:
+	      clear_canvas();
+	      draw_two();
+	      draw_other_two();
+	      uni.innerHTML = "⚃";
+	      break;
+	  case 5:
+	      clear_canvas();
+	      draw_one();
+	      draw_two();
+	      draw_other_two();
+	      uni.innerHTML = "⚄";
+	      break;
+	  case 6:
+	      clear_canvas();
+	      draw_two();
+	      draw_mid_two();
+	      draw_other_two();
+	      uni.innerHTML = "⚅";
+	      break;
+	  default:
+	      clear_canvas();
+	      uni.innerHTML = "🎲";
+	      console.log("No such number.");
+	  }
+      }
+      
+      function roll_die(obj_id,
+			uni_id,
+			count_id,
+			params) {
+	  let rnum = gen_num();
+	  obj = document.getElementById(obj_id);
+	  uni = document.getElementById(uni_id);
+	  counter = document.getElementById(count_id);
+	  params.roll_counter++;
+	  console.log("Counter: " + params.roll_counter);
+	  counter.innerHTML = params.roll_counter;
+	  obj.innerHTML = rnum;
+	  console.log("Rolled: " + rnum);
+	  draw_dots(rnum);
+	  log_params();
+      }
+      function reset_counter(count_id,params) {
+	  counter = document.getElementById(count_id);
+	  params.roll_counter = 0;
+	  counter.innerHTML=params.roll_counter;
+      }
+      function log_score_space(space_id,table_id) {
+	  const sp = document.getElementById(space_id);
+	  const tb = document.getElementById(table_id);
+	  console.log("score space (w,h): " + sp.width + ", " + sp.height);
+	  console.log("score table (w,h): " + tb.width + ", " + tb.height);
+      }
+    </script>
+  </head>
+  <body onload="resize_canvas('a_canvas');calc_params();roll_die('rand_num','uni_die','roll_count',params)">
+    <div id="outer_space">
+      <canvas id="a_canvas"></canvas>
+    </div>
+    <div id="score_space">
+      <table id="score_table">
+	<tr><td>Number rolled:</td><td class="centred"><span id="rand_num"></span></td></tr>
+	<tr><td>In Unicode:</td><td class="centred"><span class="die" id="uni_die"></span></td></tr>
+	<tr><td>Roll Count:</td><td class="centred"><span id="roll_count">0</span></td></tr>
+	<tr>
+	  <td class="centred"><button id="roll_btn" onClick="roll_die('rand_num','uni_die','roll_count',params)" autofocus>Roll</button></td>
+	  <td class="centred"><button id="roll_btn" onClick="reset_counter('roll_count',params)">Reset</button></td>
+	</tr>
+      </table>
+    </div>
+
+    <script>
+      const canv = document.getElementById(canv_id);
+      const btn = document.getElementById(roll_id);
+      canv.addEventListener("click", function(){
+      	  event.preventDefault();
+      	  console.log("canvas clicked");
+      	  btn.click();
+      }, false);
+      btn.addEventListener("click", function(){
+      	  console.log("button clicked");
+      }, false);
+      document.addEventListener("keydown", function(){
+      	  event.preventDefault();
+      	  console.log("key pressed");
+      	  btn.click();
+      }, false);
+      window.addEventListener('resize', function() {
+	  resize_canvas(canv_id);
+	  calc_params();
+	  draw_dots(Number(document.getElementById("rand_num").innerHTML));
+	  log_score_space("score_space","score_table");
+      }, false);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Drawing in Pre Space</title>
+    <link rel="shortcut icon" type="image/jpg" href="img/favicon.ico"/>
+    <style type="text/css">
+      pre {
+	  display: block;
+	  font-family: monospace;
+	  white-space: pre;
+	  margin: 1em 0;
+	  line-height: 1.1ex;
+	  background: black;
+	  color: white;
+	  width: 98.5vw;
+	  height: 98.5vw;
+      }
+      table {
+	  border:1px solid #c6c2b6;
+	  text-align: center;
+	  padding: 1vw;
+      }
+      td {
+	  padding: 0.5vw;
+      }
+      input {
+	  font-size: 100%;
+      }
+      input.nb {
+	  text-align: right;
+      }
+      input.cb {
+	  width: 2vw;
+	  height: 2vh;
+      }
+      h1 {
+	  font-size: 150%;
+      }
+      body {
+	  font-size: 2vw;
+      }
+    </style>
+    <script type="text/javascript">
+      let siz = 241;
+      const ini = ' ';
+      const dot = 'x';
+      class Matrix {
+#m;
+#s;
+#full;
+#empty;
+	  constructor(num,ini=" ",full="x",empt=" ") {
+	      this.#s = num;
+	      // this.#m = Array(num).fill(ini).map(() => Array(num).fill(ini));
+	      this.#m = [...new Array(num)].map(elem => new Array(num).fill(ini));
+	      //console.log(`Constructor: num == ${num}`);
+	      //console.log("Constructed: [" + this.#m + "]");
+	      this.#full = full;
+	      this.#empty = empt;
+	  }
+	  place_dot(n=Math.floor(this.#s/2)) {
+	      for (let i = 0; i < this.#s; ++i) {
+		  this.#m[0][i] = (i == n) ? this.#full : this.#empty;
+	      }
+	  }
+	  place_dots(nums) {
+	      console.log(`Indices to initialise: [${nums}]`);
+	      for(let i in nums) {
+		  this.#m[0][nums[i]] = this.#full;
+	      }
+	  }
+	  reset() {
+	      for (let i = 0; i < this.#s; ++i) {
+		  this.#m[0][i] = this.#empty;
+	      }
+	  }
+	  get size() { return this.#s; }
+	  get m() { return this.#m; }
+	  get empty() { return this.#empty; }
+	  get full() { return this.#full; }
+	  static crawler(rule,m) {
+	      //console.log(`matrix size: ${m.size}`);
+	      //console.log(m.m);
+	      for(let i = 1; i < m.size; ++i) {
+		  for(let j = 0; j < m.size; ++j) {
+		      //console.log(`i: ${i}, j: ${j}`);
+		      if (rule(i,j,m)) {
+			  m.m[i][j] = m.full;
+		      } else {
+			  m.m[i][j] = m.empty;
+		      }
+		  }
+	      }
+	  }
+	  to_str() {
+	      let out = "";
+	      for(let i of this.#m) {
+		  for(let j of i) {
+		      out = out.concat(j);
+		  }
+		  out = out.concat('\n');
+	      }
+	      return out;
+	  }
+	  print() {
+	      for(let i of this.#m) {
+		  for(let j of i) {
+		      process.stdout.write(j);
+		      process.stdout.write(' ');
+		  }
+		  process.stdout.write('\n');
+	      }
+	  }
+      }
+      function stester(rule,size,starting) {
+	  const m = new Matrix(size);
+	  console.log(`Size: ${size}`);
+	  m.place_dots(starting == "" ? [0, Math.floor(size/2), size-1] : starting);
+	  Matrix.crawler(rule,m);
+	  return m.to_str();
+      }
+      function draw(rule) {
+	  const starting_row = firstrow_dots.value.trim().split(" ");
+	  arr_out.innerHTML = stester(rule,siz,starting_row);
+      }
+      const ctrl_lbls = [
+	  ["↖","⬆","↗"],
+	  ["and","or","not"],
+	  ["(",")","⇦"]
+      ];
+      function add_to_formula(ctrlstr) {
+	  formula.value = formula.value + " " + ctrlstr;
+      }
+      function backspace_in_formula() {
+	  const tmp_vect = formula.value.split(' ');
+	  tmp_vect.pop();
+	  formula.value = tmp_vect.join(' ');
+      }
+      function interpret_formula() {
+	  const transl_tbl = {
+	      "↖": "m.m[x-1][y-1] == dot",
+	      "⬆": "m.m[x-1][y] == dot",
+	      "↗": "m.m[x-1][y+1] == dot",
+	      and: "&&",
+	      or: "||",
+	      not: "!",
+	      "(": "(",
+	      ")": ")"
+	  };
+	  const input_ctrl = formula.value.trim().split(' ');
+	  let out_str = "function(x,y,m) { return(";
+	  for(it of input_ctrl) {
+	      out_str = out_str.concat(transl_tbl[it] + ' ');
+	  }
+	  out_str = out_str.concat("); }");
+	  console.log(out_str);
+	  return(new Function("return " + out_str)());
+      }
+      function setup_controls() {
+	  const t = document.createElement("table");
+	  const t_id = document.createAttribute("id");
+	  t_id.value = "ctrls_tbl";
+	  t.setAttributeNode(t_id);
+	  for(row of ctrl_lbls) {
+	      const trow = document.createElement("tr");
+	      for(cell of row) {
+		  const tcell = document.createElement("td");
+		  const tinp = document.createElement("input");
+		  const tinp_type = document.createAttribute("type");
+		  tinp_type.value = "button";
+		  tinp.setAttributeNode(tinp_type);
+		  const cval = document.createAttribute("value");
+		  cval.value = cell;
+		  tinp.setAttributeNode(cval);
+		  const clck = document.createAttribute("onclick");
+		  if (cell == "⇦") {
+		      clck.value = "backspace_in_formula()";
+		  } else {
+		      clck.value = "add_to_formula('" + cell + "')";
+		  }
+		  tinp.setAttributeNode(clck);
+		  tcell.appendChild(tinp);
+		  trow.appendChild(tcell);
+	      }
+	      t.appendChild(trow);
+	      console.log('\n');
+	  }
+	  
+	  ctrls.appendChild(t);
+      }
+      function fill_in_row_data() {
+	  colnum.value = siz;
+	  firstrow_dots.placeholder = "e.g. 0 " + Math.floor(siz / 2) + " " + (siz-1);
+      }
+      function toggle_interpreter_read(formula_id,protector_id) {
+	  if (document.getElementById(protector_id).checked) {
+	      document.getElementById(formula_id).setAttribute("readonly",true);
+	      console.log("should be readonly");
+	  } else {
+	      document.getElementById(formula_id).removeAttribute("readonly");
+	      console.log("should be writeable");
+	  }
+      }
+      function change_font_size(out_id,fs_id) {
+	  document.getElementById(out_id).style.fontSize = document.getElementById(fs_id).value + "%";
+      }
+    </script>
+  </head>
+  <!-- <body> -->
+  <body onload="setup_controls();fill_in_row_data();change_font_size('scriptout','out_fontsize')">
+    <h1>Setup Starting Row</h1>
+    <p>There are <input type="number" class="nb" min="3" max="999" id="num_of_cols"></input> columns. Give a list of numbers (separated with space) where the initial dots need to be.</p>
+    <p><input type="text" id="initrow" size="72" /></p>
+    <h1>Logic Editor</h1>
+    <div id="ctrl_btns">
+    </div>
+    <div>
+      <p>The following is an example. You can delete back (⇦) to modify the formula:</p>
+      <p><input type="text" size="72" id="formula" value="( ↖ or ↗ ) and not ( ↖ and ↗ )" readonly></input>
+      <input type="checkbox" class="cb" id="write_protect" onclick="toggle_interpreter_read('formula','write_protect')" checked>Readonly</input></p>
+      <p><input type="button" id="interpreter" value="Draw" onclick="draw(interpret_formula('out_fontsize'))" /></p>
+    </div>
+    <div>
+      <p><input type="number" class="nb" id="out_fontsize" value="34" min="10" max="100" step="1">%
+	<input type="button" id="btn_outfont" value="Font Size" onclick="change_font_size('scriptout','out_fontsize')" />
+      </p>
+      <pre id="scriptout">
+      </pre>
+    </div>
+    <script type="text/javascript">
+      const arr_out = document.getElementById("scriptout");
+      const ctrls = document.getElementById("ctrl_btns");
+      const formula = document.getElementById("formula");
+      const colnum = document.getElementById("num_of_cols");
+      const firstrow_dots = document.getElementById("initrow");
+      colnum.addEventListener("change", function(){
+      	  event.preventDefault();
+      	  console.log(`new column number: ${colnum.value}`);
+	  siz = Number(colnum.value);
+	  fill_in_row_data();
+      }, false);
+
+    </script>
+  </body>
+</html>
+<!-- 10% and 821 columns is the max resolutionv tested so far -->
+<!-- ( ↖ or ⬆ or ↗ ) and not ( ( ↖ and ⬆ and ↗ ) or ( ↖ and ⬆ ) or ( ↖ and ↗ ) ) -->
+<!-- 0 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 -->

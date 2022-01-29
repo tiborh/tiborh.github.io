@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Main Page</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="shortcut icon" type="image/jpg" href="javascript/img/favicon.ico"/>
+    <style>
+      html,
+      body {
+          height: 100%;
+      }
+      body {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0;
+	font-size: 2vw;
+	font-family: helvetica,arial,sans-serif;
+	background: #EBF6F7;
+      }
+      .header-menu,
+      footer {
+        display: flex;
+        align-items: center;
+        width: 100%;
+	/* height: 10vh; */
+      }
+      .header-menu {
+        justify-content: flex-end;
+        height: 10vh;
+        background: #4D8FAC;
+        color: #fff;
+      }
+      h2 {
+          margin: 0 0 0.8vh;
+	  color: #181B26;
+      }
+      ul li {
+        display: inline-block;
+        padding: 0 1vh;
+        list-style: none;
+      }
+      aside {
+	  font-size: 75%;
+          flex: 0.4;
+          height: 20vh;
+          padding-left: 1vw;
+          border-left: 1px solid #666;
+	  margin-top: 10vh;
+      }
+      section {
+        flex: 1;
+        padding-right: 1vw;
+	margin-left: 15vw;
+      }
+      footer {
+          padding: 0 1.2vh;
+	  padding-left: 15vw;
+          background: #C6C2B6;
+      }
+      a { text-decoration: none;
+	  color: #344D56;
+	}
+      a:hover {
+	  color: #C6C2B6;
+      }
+      .sidenav {
+	  height: 90vh;
+	  width: 10vw;
+	  position: fixed;
+	  z-index: 1;
+	  top: 10vh;
+	  left: 0;
+	  background-color: #181B26;
+	  overflow-x: hidden;
+	  padding-top: 2vh;
+      }
+
+      .sidenav a {
+	  padding: 0.5vh 0.5vw 0.5vh 1vw;
+	  text-decoration: none;
+	  font-size: 1.5vw;
+	  color: #757D75;
+	  display: block;
+      }
+
+      .sidenav a:hover {
+	  color: #C6C2B6;
+      }
+      @media screen and (max-height: 90vh) {
+	  .sidenav {padding-top: 2vh;}
+	  .sidenav a {font-size: 1.5vw;}
+      }
+      td {
+	  padding: 0.5vw;
+      }
+      small {
+	  font-size: 50%;
+	  font-family: times,serif;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header-menu">
+      <nav>
+      </nav>
+    </header>
+    <div class="sidenav">
+      <!-- <a href="#about">About</a> -->
+      <!-- <a href="#services">Services</a> -->
+      <!-- <a href="#clients">Clients</a> -->
+      <!-- <a href="#contact">Contact</a> -->
+    </div>
+    <section>
+      <article>
+        <header>
+          <h2>Experiments with Javascript</h2>
+          <small><i>On the path of learning</i></small>
+        </header>
+        <ol>
+	  <li><a href="javascript/circle_calculations.html">basic circle calculations</a></li>
+	  <li><a href="javascript/change_rectangle_colour_with_slider.html">change colour with slider</a></li>
+	  <li><a href="javascript/colour_grid.html">colour grid</a></li>
+	  <li><a href="javascript/counter.html">counter (with encapsulation)</a></li>
+	  <li><a href="javascript/mouseover_demo.html">mouseover demo</a></li>
+	  <li><a href="javascript/oo_circle.html">circle as object</a></li>
+	  <li><a href="javascript/draw_shapes.html">draw shapes</a> (resize resistant)</li>
+	  <li><a href="javascript/draw_shapes_frame.html">draw random shapes</a></li>
+	  <li><a href="javascript/draw_on_resizable_canvas.html">draw on a resizable canvas</a></li>
+	  <li><a href="javascript/pattern_drawing.html">pattern drawing with logical operators</a></li>
+	  <li><a href="javascript/random_colour.html">random colour</a></li>
+	  <!-- <li><a href="javascript/change_canvas_size.html">resize canvas (with slider)</a></li> -->
+	  <li><a href="javascript/roll_die.html">roll a die</a></li>
+	  <li><a href="javascript/sine3.html">sine coordinates</a></li>
+	  <li><a href="javascript/text_to_colour.html">text to colour converter</a></li>
+	  <li><a href="dyngraph/dyngraph.html">dynamic graph</a><!--(<a href="dyngraph/dev/dyngraph.html">dev</a>)--></li>
+	  <li><a href="javascript/graph.html">graph connectedness tester</a></li>
+	  <li><a href="javascript/graph_builder.html">graph builder (with matrix)</a></li>
+	  <li><a href="javascript/fractal_tree.html">fractal tree</a></li>
+    </ol>
+      </article>
+    </section>
+    <aside>
+      <p><a href="https://gitlab.com/tiborh/learning/-/tree/master/javascript">on GitLab</a></p>
+      <p><a href="https://github.com/tiborh/dyngraph">on GitHub</a></p>
+    </aside>
+    <footer>
+      <table id="colour_tbl"><tr><td style="background-color: rgb(115, 105, 108);"></td><td style="background-color: rgb(117, 114, 117);"></td><td style="background-color: rgb(115, 116, 64);"></td><td style="background-color: rgb(103, 109, 97);"></td><td style="background-color: rgb(105, 108, 46);"></td><td style="background-color: rgb(99, 111, 109);"></td></tr></table>
+    </footer>
+  </body>
+</html>

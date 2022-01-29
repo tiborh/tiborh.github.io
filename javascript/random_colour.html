@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Random Colour with Button</title>
+    <link rel="shortcut icon" type="image/jpg" href="img/favicon.ico"/>
+    <style>
+      #outer_space{
+	  /* border: 1px solid #000000; */
+	  text-align: center;
+	  position: absolute;
+	  top: 50%;
+	  left: 50%;
+	  margin-top: -15px;
+	  margin-left: -50px;
+	  width: 100px;
+	  height: 30px;
+      }​
+      .large_font {
+	  font-size: 20px;
+      }
+    </style>
+    <script>
+      var max_num = 255;
+      var min_num = 0;
+      function gen_num(nmin=min_num,nmax=max_num) {
+	  return(Math.floor((Math.random() * nmax) + nmin));
+      }
+      function gen_colour() {
+	  red = gen_num();
+	  green = gen_num();
+	  blue = gen_num();
+	  the_colour = "#"+Number(red).toString(16).padStart(2,'0')+Number(green).toString(16).padStart(2,'0')+Number(blue).toString(16).padStart(2,'0');
+	  document.body.style.backgroundColor = the_colour;
+	  pushbtn.value = the_colour;
+	  console.log(the_colour);
+      }
+    </script>
+  </head>
+  <body onload=gen_colour()>
+    <div id="outer_space">
+	<input type="button" id="push_me" value="Push me" style="font-size: 20px;" onClick=gen_colour() autofocus></input>
+    </div>
+    <script>
+      var pushbtn = document.getElementById("push_me");
+      var outspace = document.getElementById("outer_space");
+      document.addEventListener("click", function(){
+      	  event.preventDefault();
+      	  console.log("document clicked");
+      	  pushbtn.click();
+      }, false);
+      document.addEventListener("keydown", function (event) {
+	  event.preventDefault();
+      	  console.log("key pressed");
+      	  pushbtn.click();
+      }, false);
+     
+    </script>
+  </body>
+</html>

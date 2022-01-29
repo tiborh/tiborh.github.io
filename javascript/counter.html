@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Counter</title>
+    <link rel="shortcut icon" type="image/jpg" href="img/favicon.ico"/>
+    <style type="text/css">
+      #counter_space {
+	  /* border: 1px solid #000000; */
+	  position: absolute;
+	  /* top: 50%; */
+	  /* left: 50%; */
+	  margin-top: 24vh;
+	  margin-left: 38vw;
+	  width: 24vw;
+	  height: 32vh;
+      }
+      table {
+	  /* border: 1px solid #000000 ;*/
+	  background-color: #97645A;
+	  /* color: #FFDDCA; */
+	  width: 24vw;
+	  height: 32vh;
+	  font-size: 2vw;
+      }
+      td {
+	  padding: 1vw;
+	  text-align: center;
+      }
+      button {
+	  font-size: 4vw;
+	  color: #351E1C;
+      }
+      input {
+	  font-size: 4vw;
+	  color: #351E;
+	  width: 20vw;
+	  text-align: right;
+      }
+    </style>
+    <script type="text/javascript">
+      const counter = (function() {
+	  let _starter = 0;
+	  let _internal_var = _starter;
+	  function _incr() {
+	      return _internal_var++;
+	  }
+	  function _reset(starter = _starter) {
+	      _starter = starter;
+	      _internal_var = _starter;
+	      return true;
+	  }
+	  function _peek() {
+	      return _internal_var;
+	  }
+	  return function() {
+	      return {
+		  count: _incr,
+		  peek:  _peek,
+		  reset: _reset
+	      };
+	  }
+      })();
+      const c = new counter();
+      function count_action() {
+	  c.count();
+	  display.value = c.peek();
+      }
+      function reset_action() {
+	  c.reset();
+	  display.value = c.peek();
+      }
+    </script>
+  </head>
+  <body onload="display.value = c.peek()">
+    <div id="counter_space">
+      <table>
+	<tr><td><input type="number" id="disp_space"></input></td></tr>
+	<tr><td><button id="count_btn" onclick="count_action()" autofocus>Count</button></td></tr>
+	<tr><td><button type="button" id="reset_btn" onclick="reset_action()">Reset</button></td></tr>
+      </table>
+    </div>
+    <script type="text/javascript">
+      const display = document.getElementById("disp_space");
+      display.addEventListener("change", function(){
+	  if (display.value != c.peek()) {
+	      display.value = c.peek();
+      	      console.log("event listener activated");
+	  }
+      }, false);
+    </script>
+  </body>
+</html>
