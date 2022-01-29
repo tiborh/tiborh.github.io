@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Draw on Resizable Canvas</title>
+    <link rel="shortcut icon" type="image/jpg" href="img/favicon.ico"/>
+    <style type="text/css">
+      /* #canvas_space{ */
+      /* 	  border: 1px solid #00ff00; */
+      /* }​ */
+      body {
+	  font-family: helvetica,arial,sans-serif;
+      }
+      input[type=range]{
+	  outline: none;
+	  background:transparent;
+	  /* background-color: #1F4788; */
+      }
+      input[type=range].vertical{
+	  -webkit-appearance: slider-vertical; /* WebKit */
+	  width: 1vw;
+	  height: 82vh;
+	  padding: 0 1vw;
+      }
+      input[type=range].horizontal{
+	  -webkit-appearance: slider-horizontal; /* WebKit */
+	  width: 90vw;
+	  height: 1vh;
+	  padding: 1vh 0;
+      }
+      #a_canvas {
+	  border: 1px solid #191F45;
+	  background-color: #EBF6F7;
+      }
+      .middle {
+	  vertical-align: middle;
+	  text-align: center;
+      }
+      .fix_width {
+	  width: 198px;
+      }
+      .centred {
+	  text-align: center;
+      }
+      .left_aligned {
+	  text-align: left;
+      }
+      .right_aligned {
+	  text-align: right;
+      }
+      .top_aligned {
+	  vertical-align: top;
+      }
+      button {
+	  font-size: 2vw;
+	  padding:0.40vw;
+	  /* background: #c6c2b6; */
+      }
+      input.cb {
+	  width: 2vw;
+	  height: 2vh;
+      }
+      label {
+	  border:1px solid #c6c2b6;
+	  padding:0.45vw;
+	  font-size: 2vw;
+	  
+	  /* margin:0 0 10px; */
+	  /* display:block;  */
+      }
+
+      label:hover {
+	  background:#c6c2b6;
+	  cursor:pointer;
+      }
+
+    </style>
+    <script type="text/javascript">
+      function sleep(ms) {
+	  return new Promise(resolve => setTimeout(resolve, ms));
+      }
+      function gen_num(nmax,nmin=0) {
+	  return(Math.floor((Math.random() * (nmax + nmin)) - nmin));
+      }
+      function gen_colour() {
+	  red = gen_num(255);
+	  green = gen_num(255);
+	  blue = gen_num(255);
+	  the_colour = "#"+Number(red).toString(16).padStart(2,'0')+Number(green).toString(16).padStart(2,'0')+Number(blue).toString(16).padStart(2,'0');
+	  console.log("colour: " + the_colour);
+	  return the_colour;
+      }
+      class Point {
+	  constructor(x, y, c="black") {
+	      this.x = x;
+	      this.y = y;
+	      this.c = c;
+	  }
+      }
+      class Canvas {
+#canv;
+#hslider;
+#vslider;
+#has_colours;
+#points = [];
+	  constructor(canv_id,hslider_id,vslider_id,div_id){
+	      this.#canv = document.getElementById(canv_id);
+	      this.#hslider = document.getElementById(hslider_id);
+	      this.#vslider = document.getElementById(vslider_id);
+	      this.#points.push(new Point(0,0));
+	      this.#has_colours = false;
+	  }
+	  log_hslider() {
+	      console.log("horizontal slider:");
+	      console.log(`   value: ${this.#hslider.value}`);
+	  }
+	  log_vslider() {
+	      console.log("vertical slider:");
+	      console.log(`   value: ${this.#vslider.value}`);
+	  }
+	  log() {
+	      console.log("canvas:");
+	      console.log(`   width: ${this.#canv.width}`);
+	      console.log(`  height: ${this.#canv.height}`);
+	  }
+	  clear_points() {
+	      this.#points.length = 1;
+	      // this.#points.push(Point(0,0));
+	  }
+	  peek_last_point() {
+	      return(this.#points[this.#points.length-1]);
+	  }
+	  draw_line(to_point,from_point=this.peek_last_point()) {
+	      const ctx = this.#canv.getContext("2d");
+	      ctx.beginPath();
+	      ctx.moveTo(from_point.x,from_point.y);
+	      console.log("from (" + from_point.x + "," + from_point.y + ")");
+	      ctx.lineTo(to_point.x,to_point.y);
+	      console.log("to (" + to_point.x + "," + to_point.y + ")");
+	      if (this.#has_colours) {
+		  to_point.c = gen_colour();
+	      }
+	      ctx.strokeStyle = to_point.c;
+	      ctx.stroke();
+	  }
+	  draw_points() {
+	      const len = this.#points.length;
+	      for(let i = 1; i < len; ++i) {
+		  this.draw_line(this.#points[i],this.#points[i-1]);	
+	      }
+	  }
+	  paint_picture() {
+	      const ctx = this.#canv.getContext('2d');
+	      ctx.clearRect(0, 0, this.#canv.width, this.#canv.height);
+	      ctx.fillStyle=gen_colour();
+	      ctx.strokeStyle=gen_colour();
+	      ctx.beginPath();
+	      ctx.moveTo(this.#points[1].x,this.#points[1].y);
+	      const len = this.#points.length;
+	      for(let i = 2; i < len; ++i) {
+		  ctx.lineTo(this.#points[i].x,this.#points[i].y);	
+	      }
+	      ctx.closePath();
+	      ctx.stroke();
+	      ctx.fill();
+	  }
+	  add_point(p) {
+	      this.#points.push(p);
+	  }
+	  clear_canvas() {
+	      const ctx = this.#canv.getContext('2d');
+	      ctx.clearRect(0, 0, this.#canv.width, this.#canv.height);
+	      this.clear_points();
+	  }
+	  set width(w)  { this.#canv.width =  w; }
+	  set height(h) { this.#canv.height = h; }
+	  set colours(b) { this.#has_colours = b; }
+	  set_size (w,h) {
+	      this.#canv.width = w;
+	      this.#canv.height = h;
+	  }
+	  get width()  { return this.#canv.width;  }
+	  get height() { return this.#canv.height; }
+	  get size()   { return [this.#canv.width,
+				 this.#canv.height]; }
+	  get colours() { return this.#has_colours; }
+	  get canvas() { return this.#canv; }
+	  get hslider() { return this.#hslider; }
+	  get vslider() { return this.#vslider; }
+      }
+      function resize_canvas(c,w,h) {
+	  c.set_size(w,h);
+	  c.hslider.style.width = w;
+	  c.vslider.style.height = h;
+	  c.log();
+      }
+      function kickstart_canvas(c) {
+	  const hsize = (c.hslider.value/100) * window.innerWidth;
+	  const vsize = (c.vslider.value/100) * window.innerHeight;
+	  resize_canvas(c,hsize,vsize);
+      }
+      async function draw_lines(btn_draw_id,btn_ir_id,btn_paint_id) {
+	  _stop = false;
+	  const btn_drw = document.getElementById(btn_draw_id);
+	  const btn_ir = document.getElementById(btn_ir_id);
+	  const btn_paint = document.getElementById(btn_paint_id);
+	  btn_drw.disabled = true;
+	  btn_ir.disabled = false;
+	  btn_paint.disabled = false;
+	  
+	  while(!_stop) {
+	      p = new Point(gen_num(c.width),gen_num(c.height));
+	      // const to_log = {newx:newx, newy:newy};
+	      //console.log(to_log);
+	      c.draw_line(p);
+	      c.add_point(p);
+	      await sleep(500);
+	  }
+	  btn_drw.disabled = false;
+	  btn_ir.disabled = true;
+	  //btn_paint.disabled = true;
+      }
+      function clear_rectangle(btn_paint_id) {
+	  c.clear_canvas();
+	  document.getElementById(btn_paint_id).disabled = true;
+      }
+      function paint_picture() {
+	  _stop=true;
+	  c.paint_picture();
+      }
+    </script>
+  </head>
+  <body onload="kickstart_canvas(c)";>
+    <div id="control_space">
+      <p class="centred">
+	<button id="btn_draw" onclick="draw_lines('btn_draw','btn_interrupt','btn_paint')">Draw lines</button>
+	<button id="btn_interrupt" onclick="_stop=true" disabled>Interrupt</button>
+	<button id="btn_paint" onclick="paint_picture()" disabled>Paint</button>
+	<button id="btn_clear" onclick="clear_rectangle('btn_paint')">Clear</button>
+	<label><input type="checkbox" class="cb" id="rd_colours">Colour lines</label>
+      </p>
+    </div>
+    <div id="canvas_space">
+      <table>
+	<tr>
+	  <td></td>
+	  <td><input type="range" class="horizontal" id="hslider" value="33"></input></td>
+	</tr>
+	<tr>
+	  <td><input type="range" class="vertical top" id="vslider" value="33"></input></td>
+	  <td class="middle"><canvas id="a_canvas" ondblclick="document.getElementById('btn_clear').click()"></canvas></td>
+	</tr>
+      </table>
+    </div>
+    <script type="text/javascript">
+      const c = new Canvas("a_canvas","hslider","vslider");
+      const sel_colours = document.getElementById("rd_colours");
+      sel_colours.addEventListener("change", function() {
+	  event.preventDefault();
+	  if (sel_colours.checked) {
+	      c.colours = true;
+	      console.log("colour lines selected (c.colours==" + c.colours + ")");
+	  } else {
+	      c.colours = false;
+	      console.log("colour lines deselected (c.colours==" + c.colours + ")");
+	  }
+      }, false);
+      c.hslider.addEventListener("change", function(){
+      	  event.preventDefault();
+	  _stop = true;
+	  sel_colours.checked = false;
+	  c.colours = false;
+      	  console.log(`horizontal slider value: ${c.hslider.value}`);
+	  c.width = (c.hslider.value/100) * window.innerWidth;
+	  c.draw_points();
+      }, false);
+      c.vslider.addEventListener("change", function(){
+	  event.preventDefault();
+	  _stop = true;
+	  sel_colours.checked = false;
+	  c.colours = false;
+      	  console.log(`vertical slider value: ${c.vslider.value}`);
+	  c.height = (c.vslider.value/100) * window.innerHeight;
+	  c.draw_points();
+      }, false);
+      c.canvas.addEventListener("click", function(e){
+	  event.preventDefault();
+	  //console.log("e.which: " + e.which);
+	  const draw_btn = document.getElementById("btn_draw");
+	  if (!draw_btn.disabled) {
+	      draw_btn.click();
+	  } else {
+	      document.getElementById("btn_interrupt").click();
+	  }
+      }, false);
+      window.addEventListener('resize', function() {
+	  event.preventDefault();
+	  _stop = true;
+	  sel_colours.checked = false;
+	  c.colours = false;
+	  kickstart_canvas(c);
+	  c.draw_points();
+      }, false);
+    </script>
+  </body>
+</html>
