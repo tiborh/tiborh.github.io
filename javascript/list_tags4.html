@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <!-- <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> -->
+    <link href="styles/style.css" rel="stylesheet">
+    <script src="scripts/list_tags4.js"></script>
+    <script type="text/javascript">
+      function init_page() {
+	  const default_text = "List HTML Tags";
+	  document.title = default_text;
+	  document.querySelector("h1").innerText = default_text;
+	  //document.querySelector("p").innerText = default_text;
+      }
+    </script>
+  </head>
+  <body onload="init_page()">
+    <h1></h1>
+    <p>if you click the <strong>button</strong>, <em>html</em> tags of the document get printed below.</p>
+    <p><button onclick="start_proc()">Click to start!</button></p>
+  </body>
+</html>
