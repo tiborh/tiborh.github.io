@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<!-- source: 
+     https://medium.com/swlh/javascript-working-with-images-c303ab4bd3df 
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link href="styles/working_with_images.css" rel="stylesheet">
+    <script type="text/javascript">
+      const img_src = "https://picsum.photos/200/301?id=";
+      let i;
+      function add_images(num) {
+	  const rndi = Math.floor(Math.random() * num);
+	  for(i = 0; i < num; ++i) {
+//	      const div = document.createElement("div");
+	      const fig = document.createElement("figure");
+	      const img = document.createElement("img");
+	      const cap = document.createElement("figcaption");
+	      cap.innerText = "Random image " + (i+1);
+//	      div.classList.add("main");
+	      img.src = img_src + i;
+	      img.classList.add("img-rounded-border");
+	      if (rndi == i)
+		  img.style.borderRadius = "50%";
+	      img.addEventListener("mouseover", function(e) {
+		  e.target.classList.toggle("img-highlighted");
+	      })
+	      img.addEventListener("mouseout", function(e) {
+		  e.target.classList.toggle("img-highlighted");
+	      })
+	      fig.appendChild(img);
+	      fig.appendChild(cap);
+//	      div.appendChild(fig);
+	      document.body.appendChild(fig);
+	  }
+      }
+      function refresh_images() {
+	  const imgs = document.querySelectorAll("img");
+	  imgs.forEach((item)=>{
+	      item.src = img_src + i++;
+	  });
+      }
+      function init_page() {
+	  const default_text = "Working with Images";
+	  document.title = default_text;
+	  document.querySelector("h1").innerText = default_text;
+	  //document.querySelector("p").innerText = default_text;
+	  add_images(10);
+      }
+    </script>
+  </head>
+  <body onload="init_page()">
+    <h1></h1>
+    <p>To refresh images: <button onclick="refresh_images()">Refresh</button></p>
+  </body>
+</html>
