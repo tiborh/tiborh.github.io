@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>on click</title>
+    <!-- <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> -->
+    <link href="styles/style.css" rel="stylesheet">
+    <script type="text/javascript">
+      function write_elem(txt,list) {
+	  const list_item = document.createElement("li");
+	  list_item.innerText = txt;
+	  list.appendChild(list_item);
+      }
+      document.querySelector('html').onclick = function() {
+	  const list = document.querySelector('ol');
+	  const txt = "clicked";
+	  write_elem(txt,list);
+      }
+    </script>
+  </head>
+  <body>
+    <h1>on click</h1>
+    <p>Try to click anywhere in the document.</p>
+    <ol></ol>
+  </body>
+</html>
