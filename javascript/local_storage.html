@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <!-- <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> -->
+    <link href="styles/style.css" rel="stylesheet">
+    <script type="text/javascript">
+      const name_storage = "name"
+      const default_name = "Anonymous";
+      function init_page() {
+	  const default_text = "Local Storage";
+	  document.title = default_text;
+	  document.querySelector("h1").innerText = default_text;
+	  // document.querySelector("p").innerText = default_text;
+	  // console.log(localStorage.getItem(name_storage));
+	  // document.getElementById("spn_name").textContent = default_name;
+	  if (!localStorage.getItem(name_storage))
+	      set_user_name();
+	  else
+	      display_user_name();
+      }
+      function display_user_name() {
+	  document.getElementById("spn_name").textContent = localStorage.getItem(name_storage).replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase())));
+      }
+      function set_user_name() {
+	  const a_name = prompt('Please enter your name.');
+	  if(!a_name) {
+	      set_user_name();
+	  } else {
+	      localStorage.setItem(name_storage, a_name);
+	      display_user_name();
+	  }
+      }
+      function clear_data() {
+	  localStorage.removeItem(name_storage);
+	  document.getElementById("spn_name").textContent = default_name;
+      }
+      function correct_name() {
+	  clear_data();
+	  set_user_name();
+      }
+    </script>
+  </head>
+  <body onload="init_page()">
+    <h1></h1>
+    <p>Hello, <span id="spn_name"></span>!<br /><button id="btn_correct" onclick="correct_name()">Correct name</button> <button id="btn_clear" onclick="clear_data()">Clear data</button></p>
+    <p>After setting the name:</p>
+    <ul>
+      <li>open the same page in another tab or window</li>
+      <li>reload the page (F5)</li>
+      <li>restart the browser</li>
+      <li>experiment in incognito or private window</li>
+      <li>try to find where it is stored and delete it manually</li>
+    </ul>
+  </body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <!-- <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> -->
+    <link href="styles/style.css" rel="stylesheet">
+    <script type="text/javascript">
+      function init_page() {
+	  const default_text = "Session Storage";
+	  document.title = default_text;
+	  document.querySelector("h1").innerText = default_text;
+	  //	  document.querySelector("p").innerText = default_text;
+	  console.log(sessionStorage.getItem('name'));
+	  if (!sessionStorage.getItem('name'))
+	      set_user_name();
+	  else
+	      display_user_name();
+      }
+      function display_user_name() {
+	  document.getElementById("spn_name").textContent = sessionStorage.getItem('name').replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase())));
+      }
+      function set_user_name() {
+	  const a_name = prompt('Please enter your name.');
+	  if(!a_name) {
+	      set_user_name();
+	  } else {
+	      sessionStorage.setItem('name', a_name);
+	      display_user_name();
+	  }
+      }
+      function correct_name() {
+	  sessionStorage.removeItem("name");
+	  set_user_name();
+      }
+    </script>
+  </head>
+  <body onload="init_page()">
+    <h1></h1>
+    <p>Hello, <span id="spn_name">Anonymous</span>!<br /><button id="btn_correct" onclick="correct_name()">Correct name</button></p>
+    <p>(Refresh/F5 keeps the variable in memory.)</p>
+  </body>
+</html>
