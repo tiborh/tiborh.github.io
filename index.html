@@ -1,61 +1,58 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <title>Main Page</title>
+    <title>Javascript Experiments</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" type="image/jpg" href="javascript/img/favicon.ico"/>
     <style>
       html,
       body {
           height: 100%;
+          margin: 0;
+          overflow: hidden;
       }
       body {
         display: flex;
         flex-wrap: wrap;
-        margin: 0;
-	font-size: 2vw;
 	font-family: helvetica,arial,sans-serif;
 	background: #EBF6F7;
       }
-      .header-menu,
-      footer {
+      .header-menu {
         display: flex;
         align-items: center;
-        width: 100%;
-	/* height: 10vh; */
-      }
-      .header-menu {
         justify-content: flex-end;
-        height: 10vh;
+        width: 100%;
+        height: 4vh;
         background: #4D8FAC;
         color: #fff;
       }
       h2 {
-          margin: 0 0 0.8vh;
+          margin: 0 0 0.5vh;
 	  color: #181B26;
       }
-      ul li {
-        display: inline-block;
-        padding: 0 1vh;
-        list-style: none;
-      }
       aside {
-	  font-size: 75%;
-          flex: 0.4;
-          height: 20vh;
+	  flex: 0.3;
           padding-left: 1vw;
           border-left: 1px solid #666;
-	  margin-top: 10vh;
+	  margin-top: 2vh;
       }
       section {
         flex: 1;
         padding-right: 1vw;
-	margin-left: 15vw;
+	margin-left: 6vw;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
       }
       footer {
+          display: flex;
+          align-items: center;
+          width: 100%;
           padding: 0 1.2vh;
-	  padding-left: 15vw;
+	  padding-left: 6vw;
           background: #C6C2B6;
+          height: 3vh;
       }
       a { text-decoration: none;
 	  color: #344D56;
@@ -64,37 +61,23 @@
 	  color: #C6C2B6;
       }
       .sidenav {
-	  height: 90vh;
-	  width: 10vw;
+	  height: 93vh;
+	  width: 4vw;
 	  position: fixed;
 	  z-index: 1;
-	  top: 10vh;
+	  top: 4vh;
 	  left: 0;
 	  background-color: #181B26;
 	  overflow-x: hidden;
-	  padding-top: 2vh;
       }
-
-      .sidenav a {
-	  padding: 0.5vh 0.5vw 0.5vh 1vw;
-	  text-decoration: none;
-	  font-size: 1.5vw;
-	  color: #757D75;
-	  display: block;
+      ol {
+          margin: 0;
+          padding-left: 2em;
       }
-
-      .sidenav a:hover {
-	  color: #C6C2B6;
-      }
-      @media screen and (max-height: 90vh) {
-	  .sidenav {padding-top: 2vh;}
-	  .sidenav a {font-size: 1.5vw;}
-      }
-      td {
-	  padding: 0.5vw;
+      ol li {
+          padding: 0.2vh 0;
       }
       small {
-	  font-size: 50%;
 	  font-family: times,serif;
       }
     </style>
@@ -105,10 +88,6 @@
       </nav>
     </header>
     <div class="sidenav">
-      <!-- <a href="#about">About</a> -->
-      <!-- <a href="#services">Services</a> -->
-      <!-- <a href="#clients">Clients</a> -->
-      <!-- <a href="#contact">Contact</a> -->
     </div>
     <section>
       <article>
@@ -128,15 +107,14 @@
 	  <li><a href="javascript/draw_on_resizable_canvas.html">draw on a resizable canvas</a></li>
 	  <li><a href="javascript/pattern_drawing.html">pattern drawing with logical operators</a></li>
 	  <li><a href="javascript/random_colour.html">random colour</a></li>
-	  <!-- <li><a href="javascript/change_canvas_size.html">resize canvas (with slider)</a></li> -->
 	  <li><a href="javascript/roll_die.html">roll a die</a></li>
 	  <li><a href="html/sine3.html">sine coordinates</a></li>
 	  <li><a href="javascript/text_to_colour.html">text to colour converter</a></li>
-	  <li><a href="dyngraph/dyngraph.html">dynamic graph</a><!--(<a href="dyngraph/dev/dyngraph.html">dev</a>)--></li>
+	  <li><a href="dyngraph/dyngraph.html">dynamic graph</a></li>
 	  <li><a href="javascript/graph.html">graph connectedness tester</a></li>
 	  <li><a href="javascript/graph_builder.html">graph builder (with matrix)</a></li>
 	  <li><a href="javascript/fractal_tree.html">fractal tree</a></li>
-    </ol>
+        </ol>
       </article>
     </section>
     <aside>
@@ -146,5 +124,52 @@
     <footer>
       <table id="colour_tbl"><tr><td style="background-color: rgb(115, 105, 108);"></td><td style="background-color: rgb(117, 114, 117);"></td><td style="background-color: rgb(115, 116, 64);"></td><td style="background-color: rgb(103, 109, 97);"></td><td style="background-color: rgb(105, 108, 46);"></td><td style="background-color: rgb(99, 111, 109);"></td></tr></table>
     </footer>
+    <script>
+      (function() {
+        // Cap: font size should never exceed what 10 items would need to fill the screen.
+        // With more items, text gets smaller to fit. With fewer than 10, it stops growing
+        // at the 10-item max size.
+        const CAP_ITEM_COUNT = 10;
+        const HEADER_VH = 4;
+        const FOOTER_VH = 3;
+
+        function adjustFontSize() {
+          const article = document.querySelector('article');
+          const items = document.querySelectorAll('ol li');
+          const itemCount = items.length;
+          const effectiveCount = Math.max(itemCount, CAP_ITEM_COUNT);
+
+          // Available height in pixels (between header and footer)
+          const availableHeight = window.innerHeight * ((100 - HEADER_VH - FOOTER_VH) / 100);
+
+          // Binary search for the largest font size where content fits
+          let lo = 8, hi = 120, best = 16;
+
+          while (hi - lo > 0.5) {
+            const mid = (lo + hi) / 2;
+            document.body.style.fontSize = mid + 'px';
+
+            // If we have fewer items than the cap, estimate what the height
+            // would be with CAP_ITEM_COUNT items at this font size
+            const measuredHeight = article.scrollHeight;
+            const estimatedHeight = (itemCount < CAP_ITEM_COUNT)
+              ? measuredHeight * (CAP_ITEM_COUNT / itemCount)
+              : measuredHeight;
+
+            if (estimatedHeight <= availableHeight) {
+              best = mid;
+              lo = mid;
+            } else {
+              hi = mid;
+            }
+          }
+
+          document.body.style.fontSize = best + 'px';
+        }
+
+        adjustFontSize();
+        window.addEventListener('resize', adjustFontSize);
+      })();
+    </script>
   </body>
 </html>
