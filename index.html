@@ -5,82 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" type="image/jpg" href="javascript/img/favicon.ico"/>
-    <style>
-      html,
-      body {
-          height: 100%;
-          margin: 0;
-          overflow: hidden;
-      }
-      body {
-        display: flex;
-        flex-wrap: wrap;
-	font-family: helvetica,arial,sans-serif;
-	background: #EBF6F7;
-      }
-      .header-menu {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        width: 100%;
-        height: 4vh;
-        background: #4D8FAC;
-        color: #fff;
-      }
-      h2 {
-          margin: 0 0 0.5vh;
-	  color: #181B26;
-      }
-      aside {
-	  flex: 0.3;
-          padding-left: 1vw;
-          border-left: 1px solid #666;
-	  margin-top: 2vh;
-      }
-      section {
-        flex: 1;
-        padding-right: 1vw;
-	margin-left: 6vw;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-      footer {
-          display: flex;
-          align-items: center;
-          width: 100%;
-          padding: 0 1.2vh;
-	  padding-left: 6vw;
-          background: #C6C2B6;
-          height: 3vh;
-      }
-      a { text-decoration: none;
-	  color: #344D56;
-	}
-      a:hover {
-	  color: #C6C2B6;
-      }
-      .sidenav {
-	  height: 93vh;
-	  width: 4vw;
-	  position: fixed;
-	  z-index: 1;
-	  top: 4vh;
-	  left: 0;
-	  background-color: #181B26;
-	  overflow-x: hidden;
-      }
-      ol {
-          margin: 0;
-          padding-left: 2em;
-      }
-      ol li {
-          padding: 0.2vh 0;
-      }
-      small {
-	  font-family: times,serif;
-      }
-    </style>
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
     <header class="header-menu">
@@ -95,26 +20,51 @@
           <h2>Experiments with Javascript</h2>
           <small><i>On the path of learning</i></small>
         </header>
-        <ol>
-	  <li><a href="javascript/circle_calculations.html">basic circle calculations</a></li>
-	  <li><a href="javascript/change_rectangle_colour_with_slider.html">change colour with slider</a></li>
-	  <li><a href="javascript/colour_grid.html">colour grid</a></li>
-	  <li><a href="javascript/counter.html">counter (with encapsulation)</a></li>
-	  <li><a href="javascript/mouseover_demo.html">mouseover demo</a></li>
-	  <li><a href="javascript/oo_circle.html">circle as object</a></li>
-	  <li><a href="javascript/draw_shapes.html">draw shapes</a> (resize resistant)</li>
-	  <li><a href="javascript/draw_shapes_frame.html">draw random shapes</a></li>
-	  <li><a href="javascript/draw_on_resizable_canvas.html">draw on a resizable canvas</a></li>
-	  <li><a href="javascript/pattern_drawing.html">pattern drawing with logical operators</a></li>
-	  <li><a href="javascript/random_colour.html">random colour</a></li>
-	  <li><a href="javascript/roll_die.html">roll a die</a></li>
-	  <li><a href="html/sine3.html">sine coordinates</a></li>
-	  <li><a href="javascript/text_to_colour.html">text to colour converter</a></li>
-	  <li><a href="dyngraph/dyngraph.html">dynamic graph</a></li>
-	  <li><a href="javascript/graph.html">graph connectedness tester</a></li>
-	  <li><a href="javascript/graph_builder.html">graph builder (with matrix)</a></li>
-	  <li><a href="javascript/fractal_tree.html">fractal tree</a></li>
-        </ol>
+        <ul class="categories">
+          <li>
+            <h3>Canvas &amp; Drawing</h3>
+            <ol>
+              <li><a href="javascript/draw_shapes.html">draw shapes</a> <span class="desc">&mdash; resize-resistant canvas primitives</span></li>
+              <li><a href="javascript/draw_shapes_frame.html">draw random shapes</a> <span class="desc">&mdash; randomised shape generation with animation</span></li>
+              <li><a href="javascript/draw_on_resizable_canvas.html">draw on a resizable canvas</a> <span class="desc">&mdash; freehand drawing that survives resize</span></li>
+              <li><a href="javascript/pattern_drawing.html">pattern drawing</a> <span class="desc">&mdash; visual patterns from logical operators</span></li>
+              <li><a href="javascript/fractal_tree.html">fractal tree</a> <span class="desc">&mdash; recursive tree with tuneable parameters</span></li>
+            </ol>
+          </li>
+          <li>
+            <h3>Colour &amp; Visual</h3>
+            <ol>
+              <li><a href="javascript/change_rectangle_colour_with_slider.html">change colour with slider</a> <span class="desc">&mdash; RGB sliders controlling a rectangle</span></li>
+              <li><a href="javascript/colour_grid.html">colour grid</a> <span class="desc">&mdash; interactive grid with adjustable palette</span></li>
+              <li><a href="javascript/random_colour.html">random colour</a> <span class="desc">&mdash; generate and display random hex colours</span></li>
+              <li><a href="javascript/text_to_colour.html">text to colour converter</a> <span class="desc">&mdash; encode text as RGB colour cells</span></li>
+            </ol>
+          </li>
+          <li>
+            <h3>Graphs &amp; Algorithms</h3>
+            <ol>
+              <li><a href="dyngraph/dyngraph.html">dynamic graph</a> <span class="desc">&mdash; force-directed node simulation</span></li>
+              <li><a href="javascript/graph.html">graph connectedness tester</a> <span class="desc">&mdash; load an edge list and test connectivity</span></li>
+              <li><a href="javascript/graph_builder.html">graph builder</a> <span class="desc">&mdash; build graphs interactively with adjacency matrix</span></li>
+            </ol>
+          </li>
+          <li>
+            <h3>Maths &amp; Geometry</h3>
+            <ol>
+              <li><a href="javascript/circle_calculations.html">circle calculations</a> <span class="desc">&mdash; area, circumference from radius input</span></li>
+              <li><a href="javascript/oo_circle.html">circle as object</a> <span class="desc">&mdash; OOP approach with prototype methods</span></li>
+              <li><a href="html/sine3.html">sine coordinates</a> <span class="desc">&mdash; plot sine values as an SVG curve</span></li>
+              <li><a href="javascript/roll_die.html">roll a die</a> <span class="desc">&mdash; animated die with frequency statistics</span></li>
+            </ol>
+          </li>
+          <li>
+            <h3>Interactions &amp; DOM</h3>
+            <ol>
+              <li><a href="javascript/counter.html">counter</a> <span class="desc">&mdash; encapsulated state with closures</span></li>
+              <li><a href="javascript/mouseover_demo.html">mouseover demo</a> <span class="desc">&mdash; colour changes on hover events</span></li>
+            </ol>
+          </li>
+        </ul>
       </article>
     </section>
     <aside>
@@ -123,34 +73,27 @@
     </aside>
     <footer>
       <table id="colour_tbl"><tr><td style="background-color: rgb(115, 105, 108);"></td><td style="background-color: rgb(117, 114, 117);"></td><td style="background-color: rgb(115, 116, 64);"></td><td style="background-color: rgb(103, 109, 97);"></td><td style="background-color: rgb(105, 108, 46);"></td><td style="background-color: rgb(99, 111, 109);"></td></tr></table>
+      <span class="footer-label">&#8592; text encoded as colours</span>
     </footer>
     <script>
       (function() {
-        // Cap: font size should never exceed what 10 items would need to fill the screen.
-        // With more items, text gets smaller to fit. With fewer than 10, it stops growing
-        // at the 10-item max size.
         const CAP_ITEM_COUNT = 10;
         const HEADER_VH = 4;
         const FOOTER_VH = 3;
 
         function adjustFontSize() {
           const article = document.querySelector('article');
-          const items = document.querySelectorAll('ol li');
+          const items = document.querySelectorAll('.categories ol li');
           const itemCount = items.length;
-          const effectiveCount = Math.max(itemCount, CAP_ITEM_COUNT);
 
-          // Available height in pixels (between header and footer)
           const availableHeight = window.innerHeight * ((100 - HEADER_VH - FOOTER_VH) / 100);
 
-          // Binary search for the largest font size where content fits
           let lo = 8, hi = 120, best = 16;
 
           while (hi - lo > 0.5) {
             const mid = (lo + hi) / 2;
             document.body.style.fontSize = mid + 'px';
 
-            // If we have fewer items than the cap, estimate what the height
-            // would be with CAP_ITEM_COUNT items at this font size
             const measuredHeight = article.scrollHeight;
             const estimatedHeight = (itemCount < CAP_ITEM_COUNT)
               ? measuredHeight * (CAP_ITEM_COUNT / itemCount)
