@@ -1,6 +1,3 @@
 [submodule "dyngraph"]
 	path = dyngraph
 	url = https://github.com/tiborh/dyngraph
-[submodule "tiborh.github.io"]
-	path = tiborh.github.io
-	url = https://github.com/tiborh/dyngraph
