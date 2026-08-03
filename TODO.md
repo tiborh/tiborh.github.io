@@ -12,6 +12,6 @@
 
 ## Technical Debt
 
-- **Accessibility: add `lang="en"` to `<html>`** — One-line fix in `index.html`. Also consider adding skip-to-content and ARIA landmarks.
+- ~~**Accessibility: add `lang="en"` to `<html>`** — Done. Also added skip-to-content link, ARIA landmarks (`<main>`, `aria-label` on nav/aside, `role="presentation"` on decorative sidenav).~~
 
-- **The `dyngraph/index.html` symlink** — Works on GitHub Pages but is fragile. Consider making it a real file or a redirect.
+- ~~**The `dyngraph/index.html` symlink** — Replaced with a git submodule pointing to `https://github.com/tiborh/dyngraph`. Update with `git submodule update --remote dyngraph`.~~

@@ -34,7 +34,8 @@ aside {
     margin-top: 2vh;
 }
 
-section {
+section,
+main {
     flex: 1;
     padding-right: 1vw;
     margin-left: 6vw;
@@ -123,13 +124,30 @@ small {
     font-family: times, serif;
 }
 
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    background: #4D8FAC;
+    color: #fff;
+    padding: 0.5em 1em;
+    z-index: 100;
+    font-size: 14px;
+}
+
+.skip-link:focus {
+    top: 0;
+    color: #fff;
+}
+
 /* Responsive: hide sidebar on mobile */
 @media (max-width: 600px) {
     .sidenav {
         display: none;
     }
 
-    section {
+    section,
+    main {
         margin-left: 2vw;
     }
 

@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html>
+<html lang="en">
   <head>
     <title>Javascript Experiments</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -8,13 +8,14 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
     <header class="header-menu">
-      <nav>
+      <nav aria-label="Main navigation">
       </nav>
     </header>
-    <div class="sidenav">
+    <div class="sidenav" role="presentation">
     </div>
-    <section>
+    <main id="main-content">
       <article>
         <header>
           <h2>Experiments with Javascript</h2>
@@ -66,8 +67,8 @@
           </li>
         </ul>
       </article>
-    </section>
-    <aside>
+    </main>
+    <aside aria-label="External links">
       <p><a href="https://gitlab.com/tiborh/learning/-/tree/master/javascript">on GitLab</a></p>
       <p><a href="https://github.com/tiborh/dyngraph">on GitHub</a></p>
     </aside>

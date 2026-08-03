@@ -1,0 +1,3 @@
+[submodule "dyngraph"]
+	path = dyngraph
+	url = https://github.com/tiborh/dyngraph
